@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Administrator Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            background: #dc3545;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 40px;
+            margin: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+        }
+
+        .card p {
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+
+            padding: 10px 18px;
+
+            background: #1677ff;
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 6px;
+        }
+
+        .btn:hover {
+            background: #0d5dcc;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>Administrator Dashboard</h1>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout">
+
+            Logout
+
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h2>
+                Welcome, {{ admin_name }} 👋
+            </h2>
+
+            <p>
+                Administrator Management Dashboard
+            </p>
+
+        </div>
+
+
+        <!-- CARDS -->
+
+        <div class="cards">
+
+
+            <!-- STUDENTS -->
+
+            <div class="card">
+
+                <h2>👨‍🎓</h2>
+
+                <h3>View Students</h3>
+
+                <p>
+                    View names and details
+                    of all students.
+                </p>
+
+                <a href="{{ url_for('admin_students') }}"
+                   class="btn">
+
+                    View Students
+
+                </a>
+
+            </div>
+
+
+            <!-- FACULTY -->
+
+            <div class="card">
+
+                <h2>👩‍🏫</h2>
+
+                <h3>View Faculty</h3>
+
+                <p>
+                    View names and details
+                    of faculty members.
+                </p>
+
+                <a href="{{ url_for('admin_faculty') }}"
+                   class="btn">
+
+                    View Faculty
+
+                </a>
+
+            </div>
+
+
+            <!-- NOTICE -->
+
+            <div class="card">
+
+                <h2>📢</h2>
+
+                <h3>Add Notice</h3>
+
+                <p>
+                    Add new college notices.
+                </p>
+
+                <a href="{{ url_for('add_notice') }}"
+                   class="btn">
+
+                    Add Notice
+
+                </a>
+
+            </div>
+
+
+            <!-- FEES -->
+
+            <div class="card">
+
+                <h2>💰</h2>
+
+                <h3>Add Fees Details</h3>
+
+                <p>
+                    Add fees details for students.
+                </p>
+
+                <a href="{{ url_for('add_fees') }}"
+                   class="btn">
+
+                    Add Fees
+
+                </a>
+
+            </div>
+
+
+            <!-- NOTICES -->
+
+            <div class="card">
+
+                <h2>📋</h2>
+
+                <h3>View Notices</h3>
+
+                <p>
+                    View all college notices.
+                </p>
+
+                <a href="{{ url_for('notices') }}"
+                   class="btn">
+
+                    View Notices
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>

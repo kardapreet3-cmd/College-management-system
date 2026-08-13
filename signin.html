@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>College Management - Sign Up</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f5f9;
+        }
+
+        .container {
+            width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            margin-top: 25px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .role-section {
+            display: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <h1>College Management System</h1>
+
+    <h2>Sign Up</h2>
+
+
+    <!-- ================================================= -->
+    <!-- ROLE -->
+    <!-- ================================================= -->
+
+    <label>Select Role</label>
+
+    <select id="role" onchange="showForm()" required>
+
+        <option value="">-- Select Role --</option>
+
+        <option value="student">
+            Student
+        </option>
+
+        <option value="faculty">
+            Faculty
+        </option>
+
+        <option value="admin">
+            Administrator
+        </option>
+
+        <option value="hod">
+            HOD
+        </option>
+
+        <option value="librarian">
+            Librarian
+        </option>
+
+    </select>
+
+
+
+    <!-- ================================================= -->
+    <!-- STUDENT -->
+    <!-- ================================================= -->
+
+    <div id="student" class="role-section">
+
+        <form method="POST" action="/signin">
+
+            <input type="hidden"
+                   name="role"
+                   value="student">
+
+
+            <label>Roll Number</label>
+
+            <input type="text"
+                   name="roll_no"
+                   placeholder="Enter Roll Number"
+                   required>
+
+
+            <label>Student Name</label>
+
+            <input type="text"
+                   name="name"
+                   placeholder="Enter Student Name"
+                   required>
+
+
+            <label>Department</label>
+
+            <select name="department" required>
+
+                <option value="">
+                    -- Select Department --
+                </option>
+
+                <option value="CSE">
+                    CSE
+                </option>
+
+                <option value="Electrical">
+                    Electrical
+                </option>
+
+                <option value="Mechanical">
+                    Mechanical
+                </option>
+
+                <option value="Civil">
+                    Civil
+                </option>
+
+                <option value="ENTC">
+                    ENTC
+                </option>
+
+            </select>
+
+
+            <label>Year</label>
+
+            <select name="year" required>
+
+                <option value="">
+                    -- Select Year --
+                </option>
+
+                <option value="FY">
+                    FY
+                </option>
+
+                <option value="SY">
+                    SY
+                </option>
+
+                <option value="TY">
+                    TY
+                </option>
+
+            </select>
+
+
+            <label>Division</label>
+
+            <select name="division" required>
+
+                <option value="">
+                    -- Select Division --
+                </option>
+
+                <option value="A">
+                    A
+                </option>
+
+                <option value="B">
+                    B
+                </option>
+
+            </select>
+
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Create Username"
+                   required>
+
+
+            <label>Password</label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Create Password"
+                   required>
+
+
+            <button type="submit">
+                Register Student
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- FACULTY -->
+    <!-- ================================================= -->
+
+    <div id="faculty" class="role-section">
+
+        <form method="POST" action="/signin">
+
+            <input type="hidden"
+                   name="role"
+                   value="faculty">
+
+
+            <label>Faculty Name</label>
+
+            <input type="text"
+                   name="faculty_name"
+                   placeholder="Enter Faculty Name"
+                   required>
+
+
+            <label>Department</label>
+
+            <select name="department_name" required>
+
+                <option value="">
+                    -- Select Department --
+                </option>
+
+                <option value="CSE">
+                    CSE
+                </option>
+
+                <option value="Electrical">
+                    Electrical
+                </option>
+
+                <option value="Mechanical">
+                    Mechanical
+                </option>
+
+                <option value="Civil">
+                    Civil
+                </option>
+
+                <option value="ENTC">
+                    ENTC
+                </option>
+
+            </select>
+
+
+            <label>Subject</label>
+
+            <input type="text"
+                   name="subject_name"
+                   placeholder="Enter Subject"
+                   required>
+
+
+            <label>Qualification</label>
+
+            <input type="text"
+                   name="qualification"
+                   placeholder="Example: BE / ME">
+
+
+            <label>Designation</label>
+
+            <input type="text"
+                   name="designation"
+                   placeholder="Example: Professor">
+
+
+            <label>Email</label>
+
+            <input type="email"
+                   name="email"
+                   placeholder="Enter Email">
+
+
+            <label>Mobile Number</label>
+
+            <input type="text"
+                   name="mobile_number"
+                   placeholder="Enter Mobile Number">
+
+
+            <!-- VERY IMPORTANT -->
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Create Username"
+                   required>
+
+
+            <label>Password</label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Create Password"
+                   required>
+
+
+            <button type="submit">
+                Register Faculty
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- ADMINISTRATOR -->
+    <!-- ================================================= -->
+
+    <div id="admin" class="role-section">
+
+        <form method="POST" action="/signin">
+
+            <input type="hidden"
+                   name="role"
+                   value="admin">
+
+
+            <label>Administrator Name</label>
+
+            <input type="text"
+                   name="admin_name"
+                   placeholder="Enter Administrator Name"
+                   required>
+
+
+            <label>Email</label>
+
+            <input type="email"
+                   name="admin_email"
+                   placeholder="Enter Email">
+
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Create Username"
+                   required>
+
+
+            <label>Password</label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Create Password"
+                   required>
+
+
+            <button type="submit">
+                Register Administrator
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- HOD -->
+    <!-- ================================================= -->
+
+    <div id="hod" class="role-section">
+
+        <form method="POST" action="/signin">
+
+            <input type="hidden"
+                   name="role"
+                   value="hod">
+
+
+            <label>HOD Name</label>
+
+            <input type="text"
+                   name="hod_name"
+                   placeholder="Enter HOD Name"
+                   required>
+
+
+            <label>Department</label>
+
+            <select name="hod_department" required>
+
+                <option value="">
+                    -- Select Department --
+                </option>
+
+                <option value="CSE">
+                    CSE
+                </option>
+
+                <option value="Electrical">
+                    Electrical
+                </option>
+
+                <option value="Mechanical">
+                    Mechanical
+                </option>
+
+                <option value="Civil">
+                    Civil
+                </option>
+
+                <option value="ENTC">
+                    ENTC
+                </option>
+
+            </select>
+
+
+            <label>Email</label>
+
+            <input type="email"
+                   name="hod_email"
+                   placeholder="Enter Email">
+
+
+            <label>Mobile Number</label>
+
+            <input type="text"
+                   name="hod_mobile"
+                   placeholder="Enter Mobile Number">
+
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Create Username"
+                   required>
+
+
+            <label>Password</label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Create Password"
+                   required>
+
+
+            <button type="submit">
+                Register HOD
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- LIBRARIAN -->
+    <!-- ================================================= -->
+
+    <div id="librarian" class="role-section">
+
+        <form method="POST" action="/signin">
+
+            <input type="hidden"
+                   name="role"
+                   value="librarian">
+
+
+            <label>Librarian Name</label>
+
+            <input type="text"
+                   name="librarian_name"
+                   placeholder="Enter Librarian Name"
+                   required>
+
+
+            <label>Email</label>
+
+            <input type="email"
+                   name="librarian_email"
+                   placeholder="Enter Email">
+
+
+            <label>Mobile Number</label>
+
+            <input type="text"
+                   name="librarian_mobile"
+                   placeholder="Enter Mobile Number">
+
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="username"
+                   placeholder="Create Username"
+                   required>
+
+
+            <label>Password</label>
+
+            <input type="password"
+                   name="password"
+                   placeholder="Create Password"
+                   required>
+
+
+            <button type="submit">
+                Register Librarian
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- LOGIN -->
+    <!-- ================================================= -->
+
+    <div class="login-link">
+
+        Already have an account?
+
+        <a href="/login">
+            Login here
+        </a>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script>
+
+function showForm() {
+
+    // Hide all forms
+
+    document.getElementById("student").style.display = "none";
+
+    document.getElementById("faculty").style.display = "none";
+
+    document.getElementById("admin").style.display = "none";
+
+    document.getElementById("hod").style.display = "none";
+
+    document.getElementById("librarian").style.display = "none";
+
+
+    // Get selected role
+
+    let role = document.getElementById("role").value;
+
+
+    // Show selected form
+
+    if (role === "student") {
+
+        document.getElementById("student").style.display = "block";
+
+    }
+
+    else if (role === "faculty") {
+
+        document.getElementById("faculty").style.display = "block";
+
+    }
+
+    else if (role === "admin") {
+
+        document.getElementById("admin").style.display = "block";
+
+    }
+
+    else if (role === "hod") {
+
+        document.getElementById("hod").style.display = "block";
+
+    }
+
+    else if (role === "librarian") {
+
+        document.getElementById("librarian").style.display = "block";
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>

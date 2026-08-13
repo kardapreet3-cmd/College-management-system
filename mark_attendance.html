@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Mark Attendance</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header h2 {
+            margin: 8px 0 0;
+            font-weight: normal;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #1677ff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .present {
+            width: auto;
+            transform: scale(1.2);
+            margin: 0;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        button {
+            background: #1677ff;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #095dcc;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #1677ff;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>College Management System</h1>
+
+    <h2>Mark Student Attendance</h2>
+
+</div>
+
+
+<div class="container">
+
+<form method="POST" action="{{ url_for('mark_attendance') }}">
+
+
+    <!-- ========================= -->
+    <!-- ATTENDANCE DATE -->
+    <!-- ========================= -->
+
+    <label>Attendance Date:</label>
+
+    <input
+        type="date"
+        name="attendance_date"
+        required
+    >
+
+
+    <!-- ========================= -->
+    <!-- LECTURE NUMBER -->
+    <!-- ========================= -->
+
+    <label>Lecture Number:</label>
+
+    <input
+        type="number"
+        name="lecture_number"
+        min="1"
+        placeholder="Enter lecture number"
+        required
+    >
+
+
+    <!-- ========================= -->
+    <!-- SUBJECT -->
+    <!-- ========================= -->
+
+    <label>Subject Name:</label>
+
+    <input
+        type="text"
+        name="subject_name"
+        placeholder="Enter subject name"
+        required
+    >
+
+
+    <!-- ========================= -->
+    <!-- FACULTY -->
+    <!-- ========================= -->
+
+    <label>Faculty:</label>
+
+    <select name="faculty_id" required>
+
+        <option value="">
+            Select Faculty
+        </option>
+
+        {% for faculty in faculties %}
+
+        <option value="{{ faculty[0] }}">
+            {{ faculty[1] }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+
+    <!-- ========================= -->
+    <!-- STUDENT ATTENDANCE -->
+    <!-- ========================= -->
+
+    <h3>Student Attendance</h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Roll No</th>
+
+                <th>Name</th>
+
+                <th>Department</th>
+
+                <th>Year</th>
+
+                <th>Division</th>
+
+                <th>Present</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        {% for student in students %}
+
+        <tr>
+
+            <!-- Roll No -->
+
+            <td>
+                {{ student[1] }}
+            </td>
+
+
+            <!-- Student Name -->
+
+            <td>
+                {{ student[2] }}
+            </td>
+
+
+            <!-- Department -->
+
+            <td>
+                {{ student[3] }}
+            </td>
+
+
+            <!-- Year -->
+
+            <td>
+                {{ student[4] }}
+            </td>
+
+
+            <!-- Division -->
+
+            <td>
+                {{ student[5] }}
+            </td>
+
+
+            <!-- Attendance -->
+
+            <td>
+
+                <input
+                    class="present"
+                    type="checkbox"
+                    name="status"
+                    value="{{ student[0] }}"
+                >
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    <!-- ========================= -->
+    <!-- SAVE BUTTON -->
+    <!-- ========================= -->
+
+    <div class="button-container">
+
+        <button type="submit">
+            Save Attendance
+        </button>
+
+    </div>
+
+
+</form>
+
+
+<a class="back-button"
+   href="{{ url_for('faculty_dashboard') }}">
+
+    ← Back to Faculty Dashboard
+
+</a>
+
+</div>
+
+</body>
+</html>

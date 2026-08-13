@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>College Library</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+
+            overflow-x: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        /* SEARCH */
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            flex: 1;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            font-size: 15px;
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+
+            border: none;
+
+            background: #1677ff;
+
+            color: white;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background: #0d5dcc;
+        }
+
+        .clear-btn {
+            padding: 12px 20px;
+
+            background: #6c757d;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 6px;
+        }
+
+        .clear-btn:hover {
+            background: #545b62;
+        }
+
+        /* TABLE */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+
+            border: 1px solid #ddd;
+
+            text-align: center;
+        }
+
+        th {
+            background: #1677ff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* AVAILABILITY */
+
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* BACK */
+
+        .back {
+            display: inline-block;
+
+            margin-top: 20px;
+
+            padding: 10px 18px;
+
+            background: #333;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #111;
+        }
+
+        .empty {
+            text-align: center;
+
+            padding: 30px;
+
+            color: #666;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            📚 College Library
+        </h1>
+
+    </div>
+
+
+    <!-- CONTAINER -->
+
+    <div class="container">
+
+
+        <div class="card">
+
+
+            <h2>
+                Available Library Books
+            </h2>
+
+
+            <!-- SEARCH -->
+
+            <form
+                method="GET"
+                action="{{ url_for('library') }}"
+                class="search-box"
+            >
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search book, author or department..."
+                    value="{{ search or '' }}"
+                >
+
+                <button
+                    type="submit"
+                    class="search-btn"
+                >
+                    Search
+                </button>
+
+
+                {% if search %}
+
+                    <a
+                        href="{{ url_for('library') }}"
+                        class="clear-btn"
+                    >
+                        Clear
+                    </a>
+
+                {% endif %}
+
+            </form>
+
+
+            {% if books %}
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Book ID</th>
+
+                        <th>Book Name</th>
+
+                        <th>Author</th>
+
+                        <th>Department</th>
+
+                        <th>Quantity</th>
+
+                        <th>Availability</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for book in books %}
+
+
+                    <tr>
+
+
+                        <!-- BOOK ID -->
+
+                        <td>
+                            {{ book[0] }}
+                        </td>
+
+
+                        <!-- BOOK NAME -->
+
+                        <td>
+                            {{ book[1] }}
+                        </td>
+
+
+                        <!-- AUTHOR -->
+
+                        <td>
+                            {{ book[2] }}
+                        </td>
+
+
+                        <!-- DEPARTMENT -->
+
+                        <td>
+                            {{ book[3] }}
+                        </td>
+
+
+                        <!-- QUANTITY -->
+
+                        <td>
+                            {{ book[4] }}
+                        </td>
+
+
+                        <!-- AVAILABILITY -->
+
+                        <td>
+
+                            {% if book[4] > 0 %}
+
+                                <span class="available">
+                                    ✓ Available
+                                </span>
+
+                            {% else %}
+
+                                <span class="unavailable">
+                                    ✗ Not Available
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+
+            {% else %}
+
+
+                <div class="empty">
+
+                    <h3>
+                        No Books Found
+                    </h3>
+
+                    {% if search %}
+
+                        <p>
+                            No books found for
+                            "<strong>{{ search }}</strong>".
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            No books are currently available.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+            {% endif %}
+
+
+            <!-- BACK BUTTON -->
+
+            {% if session.get("role") == "student" %}
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="back"
+                >
+                    ← Back to Dashboard
+                </a>
+
+
+            {% elif session.get("role") == "faculty" %}
+
+                <a
+                    href="{{ url_for('faculty_dashboard') }}"
+                    class="back"
+                >
+                    ← Back to Faculty Dashboard
+                </a>
+
+
+            {% elif session.get("role") == "librarian" %}
+
+                <a
+                    href="{{ url_for('librarian_dashboard') }}"
+                    class="back"
+                >
+                    ← Back to Librarian Dashboard
+                </a>
+
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="back"
+                >
+                    ← Back
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

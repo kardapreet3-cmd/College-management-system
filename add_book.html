@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Book</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 18px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1677ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Add New Book</h1>
+    </div>
+
+    <div class="container">
+
+        <div class="box">
+
+            <form method="POST">
+
+                <label>Book Name</label>
+                <input type="text"
+                       name="book_name"
+                       required>
+
+
+                <label>Author</label>
+                <input type="text"
+                       name="author"
+                       required>
+
+
+                <label>Department</label>
+
+                <select name="department" required>
+
+                    <option value="">Select Department</option>
+
+                    <option value="CSE">
+                        CSE
+                    </option>
+
+                    <option value="Electrical">
+                        Electrical
+                    </option>
+
+                    <option value="Mechanical">
+                        Mechanical
+                    </option>
+
+                    <option value="Civil">
+                        Civil
+                    </option>
+
+                    <option value="ENTC">
+                        ENTC
+                    </option>
+
+                </select>
+
+
+                <label>Quantity</label>
+
+                <input type="number"
+                       name="quantity"
+                       min="1"
+                       required>
+
+
+                <button type="submit">
+                    Add Book
+                </button>
+
+            </form>
+
+
+            <a href="{{ url_for('librarian_dashboard') }}"
+               class="back">
+
+                ← Back to Librarian Dashboard
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

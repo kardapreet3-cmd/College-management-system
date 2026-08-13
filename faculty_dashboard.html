@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            background: #dc3545;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .logout:hover {
+            background: #b02a37;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome h2 {
+            margin-top: 0;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 40px;
+            margin: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+        }
+
+        .card p {
+            color: #666;
+            min-height: 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+            background: #1677ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .btn:hover {
+            background: #0d5dcc;
+        }
+
+        .notice-btn {
+            background: #28a745;
+        }
+
+        .notice-btn:hover {
+            background: #218838;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>Faculty Dashboard</h1>
+
+        <a href="{{ url_for('logout') }}" class="logout">
+            Logout
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h2>
+                Welcome, {{ faculty_name }} 👋
+            </h2>
+
+            <p>
+                Faculty Management Dashboard
+            </p>
+
+        </div>
+
+
+        <!-- CARDS -->
+
+        <div class="cards">
+
+
+            <!-- MARK ATTENDANCE -->
+
+            <div class="card">
+
+                <h2>📝</h2>
+
+                <h3>Mark Attendance</h3>
+
+                <p>
+                    Mark attendance of students
+                    for your lecture.
+                </p>
+
+                <a href="{{ url_for('mark_attendance') }}"
+                   class="btn">
+
+                    Mark Attendance
+
+                </a>
+
+            </div>
+
+
+            <!-- VIEW ATTENDANCE -->
+
+            <div class="card">
+
+                <h2>📊</h2>
+
+                <h3>View Attendance</h3>
+
+                <p>
+                    View attendance records of
+                    all students.
+                </p>
+
+                <!-- IMPORTANT:
+                     Faculty attendance route -->
+                <a href="{{ url_for('faculty_attendance') }}"
+                   class="btn">
+
+                    View Attendance
+
+                </a>
+
+            </div>
+
+
+            <!-- LIBRARY -->
+
+            <div class="card">
+
+                <h2>📚</h2>
+
+                <h3>Library Books</h3>
+
+                <p>
+                    View available library books.
+                </p>
+
+                <a href="{{ url_for('faculty_library') }}"
+                   class="btn">
+
+                    View Library
+
+                </a>
+
+            </div>
+
+
+            <!-- NOTICES -->
+
+            <div class="card">
+
+                <h2>📢</h2>
+
+                <h3>Notices</h3>
+
+                <p>
+                    View college notices.
+                </p>
+
+                <a href="{{ url_for('notices') }}"
+                   class="btn">
+
+                    View Notices
+
+                </a>
+
+            </div>
+
+
+            <!-- ADD NOTICE -->
+
+            <div class="card">
+
+                <h2>📣</h2>
+
+                <h3>Add Notice</h3>
+
+                <p>
+                    Faculty can publish a new
+                    college notice.
+                </p>
+
+                <a href="{{ url_for('add_notice') }}"
+                   class="btn notice-btn">
+
+                    Add Notice
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

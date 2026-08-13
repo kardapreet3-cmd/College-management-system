@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HOD - Students</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            background: #28a745;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #218838;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .container {
+            width: 95%;
+            max-width: 1300px;
+            margin: 30px auto;
+        }
+
+        /* ================= BOX ================= */
+
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+            overflow-x: auto;
+        }
+
+        .box h2 {
+            margin-top: 0;
+        }
+
+        .department {
+            color: #1677ff;
+            font-weight: bold;
+        }
+
+        /* ================= TABLE ================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th {
+            background: #1677ff;
+            color: white;
+            padding: 13px;
+            text-align: center;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: #f1f5ff;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .back {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<div class="header">
+
+    <h1>HOD - Students</h1>
+
+    <a href="{{ url_for('hod_dashboard') }}" class="back">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     CONTENT
+===================================================== -->
+
+<div class="container">
+
+    <div class="box">
+
+        <h2>
+            Students of
+            <span class="department">
+                {{ department }}
+            </span>
+            Department
+        </h2>
+
+
+        {% if students %}
+
+        <!-- =================================================
+             STUDENT TABLE
+        ================================================== -->
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Student ID</th>
+
+                    <th>Roll No</th>
+
+                    <th>Name</th>
+
+                    <th>Department</th>
+
+                    <th>Year</th>
+
+                    <th>Division</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <!-- Student ID -->
+
+                    <td>
+                        {{ student[0] }}
+                    </td>
+
+
+                    <!-- Roll Number -->
+
+                    <td>
+                        {{ student[1] }}
+                    </td>
+
+
+                    <!-- Student Name -->
+
+                    <td>
+                        {{ student[2] }}
+                    </td>
+
+
+                    <!-- Department -->
+
+                    <td>
+                        {{ student[3] }}
+                    </td>
+
+
+                    <!-- Year -->
+
+                    <td>
+                        {{ student[4] }}
+                    </td>
+
+
+                    <!-- Division -->
+
+                    <td>
+                        {{ student[5] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+        <!-- =================================================
+             NO STUDENTS
+        ================================================== -->
+
+        <div class="empty">
+
+            <h3>No Students Found</h3>
+
+            <p>
+                There are currently no students registered
+                in the {{ department }} department.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

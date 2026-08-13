@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            background: #dc3545;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 40px;
+            margin: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+        }
+
+        .card p {
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+
+            background: #1677ff;
+            color: white;
+
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .btn:hover {
+            background: #0d5dcc;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>Librarian Dashboard</h1>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout">
+
+            Logout
+
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h2>
+                Welcome, {{ librarian_name }} 👋
+            </h2>
+
+            <p>
+                Library Management Dashboard
+            </p>
+
+        </div>
+
+
+        <!-- OPTIONS -->
+
+        <div class="cards">
+
+
+            <!-- VIEW BOOKS -->
+
+            <div class="card">
+
+                <h2>📚</h2>
+
+                <h3>View Books</h3>
+
+                <p>
+                    View all books available
+                    in the library.
+                </p>
+
+                <a href="{{ url_for('library') }}"
+                   class="btn">
+
+                    View Books
+
+                </a>
+
+            </div>
+
+
+            <!-- ADD BOOK -->
+
+            <div class="card">
+
+                <h2>➕</h2>
+
+                <h3>Add New Book</h3>
+
+                <p>
+                    Add a new book to
+                    the library.
+                </p>
+
+                <a href="{{ url_for('add_book') }}"
+                   class="btn">
+
+                    Add Book
+
+                </a>
+
+            </div>
+
+
+            <!-- ISSUE BOOK -->
+
+            <div class="card">
+
+                <h2>📖</h2>
+
+                <h3>Issue Book</h3>
+
+                <p>
+                    Give a book to a
+                    student.
+                </p>
+
+                <a href="{{ url_for('issue_book') }}"
+                   class="btn">
+
+                    Issue Book
+
+                </a>
+
+            </div>
+
+
+            <!-- ISSUED BOOKS -->
+
+            <div class="card">
+
+                <h2>📋</h2>
+
+                <h3>Issued Books</h3>
+
+                <p>
+                    View books currently
+                    issued to students.
+                </p>
+
+                <a href="{{ url_for('issued_books') }}"
+                   class="btn">
+
+                    View Issued Books
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

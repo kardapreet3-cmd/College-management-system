@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>View Attendance</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 11px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .present {
+            color: green;
+            font-weight: bold;
+        }
+
+        .absent {
+            color: red;
+            font-weight: bold;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #555;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📊 Attendance</h2>
+
+    {% if attendance_data %}
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Date</th>
+                <th>Lecture</th>
+                <th>Subject</th>
+
+                {% if user_role != "student" %}
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Year</th>
+                    <th>Division</th>
+                {% endif %}
+
+                <th>Faculty</th>
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for attendance in attendance_data %}
+
+            <tr>
+
+                <td>{{ attendance[0] }}</td>
+
+                <td>{{ attendance[1] }}</td>
+
+                <td>{{ attendance[2] }}</td>
+
+                {% if user_role != "student" %}
+
+                    <td>{{ attendance[3] }}</td>
+
+                    <td>{{ attendance[4] }}</td>
+
+                    <td>{{ attendance[5] }}</td>
+
+                    <td>{{ attendance[6] }}</td>
+
+                    <td>{{ attendance[7] }}</td>
+
+                    <td>{{ attendance[8] }}</td>
+
+                    <td>
+                        {% if attendance[9] == "Present" %}
+
+                            <span class="present">
+                                Present
+                            </span>
+
+                        {% else %}
+
+                            <span class="absent">
+                                Absent
+                            </span>
+
+                        {% endif %}
+                    </td>
+
+                {% else %}
+
+                    <td>{{ attendance[3] }}</td>
+
+                    <td>
+                        {% if attendance[4] == "Present" %}
+
+                            <span class="present">
+                                Present
+                            </span>
+
+                        {% else %}
+
+                            <span class="absent">
+                                Absent
+                            </span>
+
+                        {% endif %}
+                    </td>
+
+                {% endif %}
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="no-data">
+            📋 No attendance records available.
+        </div>
+
+    {% endif %}
+
+
+    <!-- =============================== -->
+    <!-- BACK TO DASHBOARD -->
+    <!-- =============================== -->
+
+    {% if session.get("role") == "student" %}
+
+        <a class="back" href="{{ url_for('dashboard') }}">
+            ← Back to Dashboard
+        </a>
+
+    {% elif session.get("role") == "faculty" %}
+
+        <a class="back" href="{{ url_for('faculty_dashboard') }}">
+            ← Back to Dashboard
+        </a>
+
+    {% elif session.get("role") == "admin" %}
+
+        <a class="back" href="{{ url_for('admin_dashboard') }}">
+            ← Back to Dashboard
+        </a>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
