@@ -26,7 +26,7 @@ app.secret_key = "college_management_2026"
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="P@reet@22",
+    password="Password",
     database="student_db"
 )
 
