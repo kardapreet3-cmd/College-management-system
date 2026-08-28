@@ -16,6 +16,8 @@
             background: #f4f6f8;
         }
 
+        /* ================= HEADER ================= */
+
         .header {
             background: #007bff;
             color: white;
@@ -42,17 +44,21 @@
             background: #eeeeee;
         }
 
+        /* ================= CONTAINER ================= */
+
         .container {
             max-width: 1100px;
             margin: 40px auto;
             padding: 20px;
         }
 
+        /* ================= WELCOME ================= */
+
         .welcome {
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.10);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
             margin-bottom: 25px;
         }
 
@@ -64,18 +70,22 @@
             color: #555;
         }
 
+        /* ================= MENU ================= */
+
         .menu {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
+
+        /* ================= CARD ================= */
 
         .card {
             background: white;
             padding: 25px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.10);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
             transition: 0.2s;
         }
 
@@ -92,6 +102,8 @@
             min-height: 40px;
         }
 
+        /* ================= BUTTON ================= */
+
         .btn {
             display: inline-block;
             text-decoration: none;
@@ -104,6 +116,24 @@
 
         .btn:hover {
             background: #0056b3;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 800px) {
+
+            .menu {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 550px) {
+
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
         }
 
     </style>
@@ -129,6 +159,8 @@
 
 <div class="container">
 
+    <!-- ================= WELCOME ================= -->
+
     <div class="welcome">
 
         <h1>
@@ -136,7 +168,7 @@
         </h1>
 
         <p>
-            Manage your attendance, books, fees and college notices from here.
+            Manage your books, fees and college notices from here.
         </p>
 
     </div>
@@ -145,46 +177,6 @@
     <!-- ================= MENU ================= -->
 
     <div class="menu">
-
-
-        <!-- VIEW ATTENDANCE -->
-
-        <div class="card">
-
-            <h3>📊 View Attendance</h3>
-
-            <p>
-                View your attendance records.
-            </p>
-
-            <a class="btn"
-               href="{{ url_for('student_attendance') }}">
-
-                View Attendance
-
-            </a>
-
-        </div>
-
-
-        <!-- MY ATTENDANCE -->
-
-        <div class="card">
-
-            <h3>📋 My Attendance</h3>
-
-            <p>
-                View your personal attendance.
-            </p>
-
-            <a class="btn"
-               href="{{ url_for('my_attendance') }}">
-
-                My Attendance
-
-            </a>
-
-        </div>
 
 
         <!-- MY BOOKS -->
