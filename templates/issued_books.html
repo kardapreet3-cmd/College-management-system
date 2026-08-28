@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Issued Books</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            background: #28a745;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #218838;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1300px;
+            margin: 30px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #1677ff;
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: #f1f5ff;
+        }
+
+        .return-btn {
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+
+            padding: 8px 14px;
+            border-radius: 5px;
+
+            display: inline-block;
+        }
+
+        .return-btn:hover {
+            background: #218838;
+        }
+
+        .returned {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .issued {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <h1>📚 Issued Books</h1>
+
+    <a href="{{ url_for('librarian_dashboard') }}"
+       class="back">
+
+        Back to Dashboard
+
+    </a>
+
+</div>
+
+
+<!-- CONTENT -->
+
+<div class="container">
+
+    <div class="box">
+
+        <h2>All Issued Books</h2>
+
+
+        {% if issues %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Issue ID</th>
+
+                    <th>Roll No</th>
+
+                    <th>Student Name</th>
+
+                    <th>Book Name</th>
+
+                    <th>Issue Date</th>
+
+                    <th>Return Date</th>
+
+                    <th>Actual Return Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for issue in issues %}
+
+                <tr>
+
+                    <!-- Issue ID -->
+
+                    <td>
+                        {{ issue[0] }}
+                    </td>
+
+
+                    <!-- Roll No -->
+
+                    <td>
+                        {{ issue[1] }}
+                    </td>
+
+
+                    <!-- Student Name -->
+
+                    <td>
+                        {{ issue[2] }}
+                    </td>
+
+
+                    <!-- Book Name -->
+
+                    <td>
+                        {{ issue[3] }}
+                    </td>
+
+
+                    <!-- Issue Date -->
+
+                    <td>
+                        {{ issue[4] }}
+                    </td>
+
+
+                    <!-- Return Date -->
+
+                    <td>
+                        {{ issue[5] }}
+                    </td>
+
+
+                    <!-- Actual Return Date -->
+
+                    <td>
+
+                        {% if issue[6] %}
+
+                            {{ issue[6] }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Status -->
+
+                    <td>
+
+                        {% if issue[7] == "Issued" %}
+
+                            <span class="issued">
+                                Issued
+                            </span>
+
+                        {% else %}
+
+                            <span class="returned">
+                                Returned
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        {% if issue[7] == "Issued" %}
+
+                            <a href="{{ url_for('return_book',
+                                               issue_id=issue[0]) }}"
+                               class="return-btn">
+
+                                Return Book
+
+                            </a>
+
+                        {% else %}
+
+                            <span class="returned">
+                                Completed
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+        <div class="empty">
+
+            <h3>📚 No Books Issued</h3>
+
+            <p>
+                There are currently no issued books.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

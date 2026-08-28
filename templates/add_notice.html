@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Add Notice</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 11px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #222;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📢 Add Notice</h2>
+
+    <form method="POST">
+
+        <label>Notice Title</label>
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Enter notice title"
+            required
+        >
+
+        <label>Notice</label>
+
+        <textarea
+            name="notice_text"
+            placeholder="Enter notice details..."
+            required
+        ></textarea>
+
+        <button type="submit">
+            Add Notice
+        </button>
+
+    </form>
+
+    <!-- FACULTY BACK BUTTON -->
+
+    {% if session.get("role") == "faculty" %}
+
+        <a href="{{ url_for('faculty_dashboard') }}" class="back">
+            ← Back to Faculty Dashboard
+        </a>
+
+    {% elif session.get("role") == "admin" %}
+
+        <a href="{{ url_for('admin_dashboard') }}" class="back">
+            ← Back to Admin Dashboard
+        </a>
+
+    {% elif session.get("role") == "hod" %}
+
+        <a href="{{ url_for('hod_dashboard') }}" class="back">
+            ← Back to HOD Dashboard
+        </a>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

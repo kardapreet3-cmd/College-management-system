@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>My Fees</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .pending {
+            color: red;
+            font-weight: bold;
+        }
+
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #555;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 18px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>💰 My Fees</h2>
+
+    {% if fee_data %}
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Fee Type</th>
+                <th>Amount</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for fee in fee_data %}
+
+            <tr>
+
+                <td>
+                    {{ fee[0] }}
+                </td>
+
+                <td>
+                    ₹ {{ fee[1] }}
+                </td>
+
+                <td>
+                    {{ fee[2] }}
+                </td>
+
+                <td>
+
+                    {% if fee[3] == "Paid" %}
+
+                        <span class="paid">
+                            Paid
+                        </span>
+
+                    {% else %}
+
+                        <span class="pending">
+                            {{ fee[3] }}
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="no-data">
+            💰 No fee records available.
+        </div>
+
+    {% endif %}
+
+    <a class="back" href="{{ url_for('dashboard') }}">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

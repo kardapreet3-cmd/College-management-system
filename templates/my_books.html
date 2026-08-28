@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>My Books</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        .issued {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .returned {
+            color: green;
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #555;
+        }
+
+        .no-books {
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+            color: #666;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📚 My Books</h2>
+
+    {% if books %}
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Book Name</th>
+                <th>Author</th>
+                <th>Issue Date</th>
+                <th>Return Date</th>
+                <th>Actual Return Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for book in books %}
+
+            <tr>
+
+                <td>{{ book[0] }}</td>
+
+                <td>{{ book[1] }}</td>
+
+                <td>{{ book[2] }}</td>
+
+                <td>{{ book[3] }}</td>
+
+                <td>
+                    {% if book[4] %}
+                        {{ book[4] }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+
+                <td>
+
+                    {% if book[5] == "Issued" %}
+
+                        <span class="issued">
+                            Issued
+                        </span>
+
+                    {% elif book[5] == "Returned" %}
+
+                        <span class="returned">
+                            Returned
+                        </span>
+
+                    {% else %}
+
+                        {{ book[5] }}
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="no-books">
+            📖 You have no books issued.
+        </div>
+
+    {% endif %}
+
+    <a class="back" href="{{ url_for('dashboard') }}">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

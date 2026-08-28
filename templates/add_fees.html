@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Add Fees</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #1677ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #0d5dcc;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 18px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #1677ff;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="header">
+
+    <h1>
+        💰 Student Fees Management
+    </h1>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- ADD FEE -->
+
+    <div class="card">
+
+        <h2>
+            Add Student Fee
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('add_fees') }}"
+        >
+
+
+            <!-- STUDENT -->
+
+            <label>
+                Select Student
+            </label>
+
+            <select
+                name="student_id"
+                required
+            >
+
+                <option value="">
+                    -- Select Student --
+                </option>
+
+
+                {% for student in students %}
+
+                <option value="{{ student[0] }}">
+
+                    Roll No: {{ student[1] }}
+                    -
+                    {{ student[2] }}
+                    |
+                    {{ student[3] }}
+                    |
+                    {{ student[4] }}
+                    |
+                    Division {{ student[5] }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <!-- FEE TYPE -->
+
+            <label>
+                Fee Type
+            </label>
+
+            <select
+                name="fee_type"
+                required
+            >
+
+                <option value="">
+                    -- Select Fee Type --
+                </option>
+
+                <option value="Tuition Fees">
+                    Tuition Fees
+                </option>
+
+                <option value="Exam Fees">
+                    Exam Fees
+                </option>
+
+                <option value="Library Fees">
+                    Library Fees
+                </option>
+
+                <option value="Sports Fees">
+                    Sports Fees
+                </option>
+
+                <option value="Development Fees">
+                    Development Fees
+                </option>
+
+                <option value="Other Fees">
+                    Other Fees
+                </option>
+
+            </select>
+
+
+            <!-- AMOUNT -->
+
+            <label>
+                Amount
+            </label>
+
+            <input
+                type="number"
+                name="amount"
+                placeholder="Enter amount"
+                min="0"
+                step="0.01"
+                required
+            >
+
+
+            <!-- DUE DATE -->
+
+            <label>
+                Due Date
+            </label>
+
+            <input
+                type="date"
+                name="due_date"
+                required
+            >
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="btn"
+            >
+
+                ➕ Add Fee
+
+            </button>
+
+
+        </form>
+
+
+        <br>
+
+
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="back"
+        >
+
+            ← Back to Admin Dashboard
+
+        </a>
+
+    </div>
+
+
+    <!-- STUDENTS -->
+
+    <div class="card">
+
+        <h2>
+            Registered Students
+        </h2>
+
+
+        {% if students %}
+
+        <table>
+
+            <tr>
+
+                <th>
+                    Student ID
+                </th>
+
+                <th>
+                    Roll No
+                </th>
+
+                <th>
+                    Name
+                </th>
+
+                <th>
+                    Department
+                </th>
+
+                <th>
+                    Year
+                </th>
+
+                <th>
+                    Division
+                </th>
+
+            </tr>
+
+
+            {% for student in students %}
+
+            <tr>
+
+                <td>
+                    {{ student[0] }}
+                </td>
+
+                <td>
+                    {{ student[1] }}
+                </td>
+
+                <td>
+                    {{ student[2] }}
+                </td>
+
+                <td>
+                    {{ student[3] }}
+                </td>
+
+                <td>
+                    {{ student[4] }}
+                </td>
+
+                <td>
+                    {{ student[5] }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+
+        {% else %}
+
+        <p>
+            No students found.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>
