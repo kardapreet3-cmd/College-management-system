@@ -23,11 +23,14 @@ app.secret_key = "college_management_2026"
 # DATABASE CONNECTION
 # =========================================================
 
+import os
+
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Password",
-    database="student_db"
+    host=os.getenv("DB_HOST", "localhost"),
+    port=int(os.getenv("DB_PORT", "3306")),
+    user=os.getenv("DB_USER", "root"),
+    password=os.getenv("DB_PASSWORD", ""),
+    database=os.getenv("DB_NAME", "student_db")
 )
 
 
@@ -1995,5 +1998,5 @@ if __name__ == "__main__":
 
     app.run(
         debug=True,
-        port=5001
+        port=5000
     )
