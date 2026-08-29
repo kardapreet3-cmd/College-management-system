@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Issue Book - Library</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #1677ff;
+            color: white;
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .back {
+            background: white;
+            color: #1677ff;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            color: #222;
+        }
+
+        .info {
+            background: #eef5ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            background: white;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: #1677ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 25px;
+
+            border: none;
+            border-radius: 6px;
+
+            background: #1677ff;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d5dcc;
+        }
+
+        .cancel {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .cancel:hover {
+            color: #1677ff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <h1>📚 Issue Book</h1>
+
+        <a href="{{ url_for('librarian_dashboard') }}"
+           class="back">
+            Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="box">
+
+            <h2>Issue Book to Student</h2>
+
+            <div class="info">
+                <strong>Note:</strong>
+                The return date will automatically be set to
+                <strong>10 days</strong> after the issue date.
+            </div>
+
+
+            <form method="POST"
+                  action="{{ url_for('issue_book') }}">
+
+
+                <!-- BOOK -->
+
+                <label for="book_id">
+                    Select Book
+                </label>
+
+                <select id="book_id"
+                        name="book_id"
+                        required>
+
+                    <option value="">
+                        -- Select Book --
+                    </option>
+
+                    {% for book in books %}
+
+                    <option value="{{ book[0] }}">
+
+                        {{ book[1] }}
+                        -
+                        {{ book[2] }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <!-- STUDENT -->
+
+                <label for="student_id">
+                    Select Student
+                </label>
+
+                <select id="student_id"
+                        name="student_id"
+                        required>
+
+                    <option value="">
+                        -- Select Student --
+                    </option>
+
+                    {% for student in students %}
+
+                    <option value="{{ student[0] }}">
+
+                        {{ student[1] }}
+                        -
+                        {{ student[2] }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <!-- ISSUE DATE -->
+
+                <label for="issue_date">
+                    Issue Date
+                </label>
+
+                <input
+                    type="date"
+                    id="issue_date"
+                    name="issue_date"
+                    required
+                >
+
+
+                <button type="submit">
+                    📖 Issue Book
+                </button>
+
+
+                <a href="{{ url_for('issued_books') }}"
+                   class="cancel">
+
+                    View Issued Books
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Automatically set today's date
+
+        const dateInput =
+            document.getElementById("issue_date");
+
+        const today =
+            new Date().toISOString().split("T")[0];
+
+        dateInput.value = today;
+
+    </script>
+
+</body>
+
+</html>

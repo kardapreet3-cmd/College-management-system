@@ -3,9 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Issued Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Issued Books - Library</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -27,88 +32,138 @@
             margin: 0;
         }
 
-        .back {
-            color: white;
+        .dashboard {
+            background: white;
+            color: #1677ff;
             text-decoration: none;
-            background: #28a745;
             padding: 10px 18px;
             border-radius: 6px;
-        }
-
-        .back:hover {
-            background: #218838;
+            font-weight: bold;
         }
 
         .container {
             width: 95%;
             max-width: 1300px;
-            margin: 30px auto;
+            margin: 35px auto;
         }
 
         .box {
             background: white;
             padding: 25px;
-            border-radius: 10px;
+            border-radius: 12px;
 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            box-shadow:
+                0 3px 15px rgba(0, 0, 0, 0.12);
+        }
 
+        h2 {
+            margin-top: 0;
+            color: #222;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .issue-btn {
+            background: #1677ff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .issue-btn:hover {
+            background: #0d5dcc;
+        }
+
+        .table-container {
             overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            min-width: 900px;
         }
 
         th {
             background: #1677ff;
             color: white;
-            padding: 12px;
-            text-align: center;
+            padding: 13px;
+            text-align: left;
         }
 
         td {
             padding: 12px;
             border-bottom: 1px solid #ddd;
-            text-align: center;
         }
 
         tr:hover {
-            background: #f1f5ff;
-        }
-
-        .return-btn {
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-
-            padding: 8px 14px;
-            border-radius: 5px;
-
-            display: inline-block;
-        }
-
-        .return-btn:hover {
-            background: #218838;
-        }
-
-        .returned {
-            color: #28a745;
-            font-weight: bold;
+            background: #f7faff;
         }
 
         .issued {
-            color: #dc3545;
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .returned {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .return-btn {
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            padding: 8px 13px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .return-btn:hover {
+            background: #15803d;
+        }
+
+        .returned-text {
+            color: #777;
             font-weight: bold;
         }
 
         .empty {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: #777;
+            font-size: 17px;
         }
 
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
     </style>
 
 </head>
@@ -116,200 +171,249 @@
 <body>
 
 
-<!-- HEADER -->
+    <!-- HEADER -->
 
-<div class="header">
+    <div class="header">
 
-    <h1>📚 Issued Books</h1>
+        <h1>📚 Issued Books</h1>
 
-    <a href="{{ url_for('librarian_dashboard') }}"
-       class="back">
+        <a href="{{ url_for('librarian_dashboard') }}"
+           class="dashboard">
 
-        Back to Dashboard
+            Dashboard
 
-    </a>
-
-</div>
-
-
-<!-- CONTENT -->
-
-<div class="container">
-
-    <div class="box">
-
-        <h2>All Issued Books</h2>
-
-
-        {% if issues %}
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Issue ID</th>
-
-                    <th>Roll No</th>
-
-                    <th>Student Name</th>
-
-                    <th>Book Name</th>
-
-                    <th>Issue Date</th>
-
-                    <th>Return Date</th>
-
-                    <th>Actual Return Date</th>
-
-                    <th>Status</th>
-
-                    <th>Action</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for issue in issues %}
-
-                <tr>
-
-                    <!-- Issue ID -->
-
-                    <td>
-                        {{ issue[0] }}
-                    </td>
-
-
-                    <!-- Roll No -->
-
-                    <td>
-                        {{ issue[1] }}
-                    </td>
-
-
-                    <!-- Student Name -->
-
-                    <td>
-                        {{ issue[2] }}
-                    </td>
-
-
-                    <!-- Book Name -->
-
-                    <td>
-                        {{ issue[3] }}
-                    </td>
-
-
-                    <!-- Issue Date -->
-
-                    <td>
-                        {{ issue[4] }}
-                    </td>
-
-
-                    <!-- Return Date -->
-
-                    <td>
-                        {{ issue[5] }}
-                    </td>
-
-
-                    <!-- Actual Return Date -->
-
-                    <td>
-
-                        {% if issue[6] %}
-
-                            {{ issue[6] }}
-
-                        {% else %}
-
-                            -
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- Status -->
-
-                    <td>
-
-                        {% if issue[7] == "Issued" %}
-
-                            <span class="issued">
-                                Issued
-                            </span>
-
-                        {% else %}
-
-                            <span class="returned">
-                                Returned
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- ACTION -->
-
-                    <td>
-
-                        {% if issue[7] == "Issued" %}
-
-                            <a href="{{ url_for('return_book',
-                                               issue_id=issue[0]) }}"
-                               class="return-btn">
-
-                                Return Book
-
-                            </a>
-
-                        {% else %}
-
-                            <span class="returned">
-                                Completed
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-
-        {% else %}
-
-        <div class="empty">
-
-            <h3>📚 No Books Issued</h3>
-
-            <p>
-                There are currently no issued books.
-            </p>
-
-        </div>
-
-        {% endif %}
-
+        </a>
 
     </div>
 
-</div>
 
+    <div class="container">
+
+        <div class="box">
+
+
+            <!-- TITLE -->
+
+            <div class="top">
+
+                <h2>
+                    Book Issue Records
+                </h2>
+
+                <a href="{{ url_for('issue_book') }}"
+                   class="issue-btn">
+
+                    + Issue New Book
+
+                </a>
+
+            </div>
+
+
+            {% if issues %}
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Issue ID
+                            </th>
+
+                            <th>
+                                Roll No.
+                            </th>
+
+                            <th>
+                                Student Name
+                            </th>
+
+                            <th>
+                                Book Name
+                            </th>
+
+                            <th>
+                                Issue Date
+                            </th>
+
+                            <th>
+                                Return Date
+                            </th>
+
+                            <th>
+                                Actual Return
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for issue in issues %}
+
+                        <tr>
+
+                            <!-- ISSUE ID -->
+
+                            <td>
+                                {{ issue[0] }}
+                            </td>
+
+
+                            <!-- ROLL NUMBER -->
+
+                            <td>
+                                {{ issue[1] }}
+                            </td>
+
+
+                            <!-- STUDENT -->
+
+                            <td>
+                                {{ issue[2] }}
+                            </td>
+
+
+                            <!-- BOOK -->
+
+                            <td>
+                                {{ issue[3] }}
+                            </td>
+
+
+                            <!-- ISSUE DATE -->
+
+                            <td>
+                                {{ issue[4] }}
+                            </td>
+
+
+                            <!-- EXPECTED RETURN -->
+
+                            <td>
+                                {{ issue[5] }}
+                            </td>
+
+
+                            <!-- ACTUAL RETURN -->
+
+                            <td>
+
+                                {% if issue[6] %}
+
+                                    {{ issue[6] }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if issue[7] == "Issued" %}
+
+                                    <span class="issued">
+                                        📖 Issued
+                                    </span>
+
+                                {% elif issue[7] == "Returned" %}
+
+                                    <span class="returned">
+                                        ✓ Returned
+                                    </span>
+
+                                {% else %}
+
+                                    {{ issue[7] }}
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTION -->
+
+                            <td>
+
+                                {% if issue[7] == "Issued" %}
+
+                                    <a
+                                        href="{{ url_for(
+                                            'return_book',
+                                            issue_id=issue[0]
+                                        ) }}"
+                                        class="return-btn"
+                                    >
+
+                                        Return
+
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="returned-text">
+                                        Completed
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {% else %}
+
+                <div class="empty">
+
+                    📚 No books have been issued yet.
+
+                    <br><br>
+
+                    <a href="{{ url_for('issue_book') }}"
+                       class="issue-btn">
+
+                        Issue First Book
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
 
 </body>
 
