@@ -26,7 +26,7 @@ app.secret_key = os.environ.get(
 )
 
 
-# =========================================================
+## =========================================================
 # DATABASE CONNECTION - AIVEN MYSQL
 # =========================================================
 
@@ -36,7 +36,8 @@ def get_db():
         port=int(os.environ.get("DB_PORT", "14254")),
         user=os.environ.get("DB_USER"),
         password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME", "defaultdb")
+        database=os.environ.get("DB_NAME", "defaultdb"),
+        ssl_disabled=False
     )
 # =========================================================
 # NO CACHE
