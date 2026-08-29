@@ -32,14 +32,12 @@ app.secret_key = os.environ.get(
 
 def get_db():
     return mysql.connector.connect(
-        host=os.environ.get("host"),
-        port=int(os.environ.get("port", "14254")),
-        user=os.environ.get("user"),
-        password=os.environ.get("password"),
-        database=os.environ.get("database", "defaultdb"),
-        ssl_disabled=False
+        host=os.environ.get("DB_HOST"),
+        port=int(os.environ.get("DB_PORT", "14254")),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD"),
+        database=os.environ.get("DB_NAME", "defaultdb")
     )
-
 # =========================================================
 # NO CACHE
 # =========================================================
