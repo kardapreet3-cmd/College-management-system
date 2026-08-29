@@ -43,19 +43,24 @@ app.secret_key = os.environ.get(
 # python app.py
 #
 # =========================================================
+app = Flask(__name__)
+
+app.secret_key = os.environ.get("SECRET_KEY", "college-management-secret-key")
+
+
+# ================= DATABASE CONNECTION =================
 
 import os
 import mysql.connector
 
 db = mysql.connector.connect(
-    host=os.environ.get("DB_HOST"),
-    port=int(os.environ.get("DB_PORT", 14254)),
-    user=os.environ.get("DB_USER"),
-    password=os.environ.get("DB_PASSWORD"),
-    database=os.environ.get("DB_NAME"),
+    host=os.getenv("DB_HOST"),
+    port=int(os.getenv("DB_PORT", "14254")),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME", "defaultdb"),
     ssl_disabled=False
 )
-
 
 # =========================================================
 # PREVENT BROWSER CACHE
