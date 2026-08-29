@@ -36,12 +36,15 @@ app.secret_key = os.environ.get(
 #
 # =========================================================
 
+import os
+import mysql.connector
+
 db = mysql.connector.connect(
-    host="mysql-18c845cb-kardapreet3-bcdd.k.aivencloud.com",
-    port=14254,
-    user="avnadmin",
+    host=os.environ.get("DB_HOST"),
+    port=int(os.environ.get("DB_PORT", 14254)),
+    user=os.environ.get("DB_USER"),
     password=os.environ.get("DB_PASSWORD"),
-    database="defaultdb",
+    database=os.environ.get("DB_NAME"),
     ssl_disabled=False
 )
 
