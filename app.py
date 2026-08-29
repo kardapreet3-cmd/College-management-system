@@ -1,9 +1,8 @@
-
 import os
 from datetime import datetime, timedelta
+from urllib.parse import urlparse, unquote
 
 import mysql.connector
-
 from flask import (
     Flask,
     render_template,
@@ -26,19 +25,258 @@ app.secret_key = os.environ.get(
 )
 
 
-## =========================================================
-# DATABASE CONNECTION - AIVEN MYSQL
+# =========================================================
+# DATABASE CONNECTION
 # =========================================================
 
 def get_db():
+
+    database_url = os.environ.get("DATABASE_URL")
+
+    # -----------------------------------------------------
+    # OPTION 1: TiDB / MySQL DATABASE_URL
+    # -----------------------------------------------------
+
+    if database_url:
+
+        parsed = urlparse(database_url)
+
+        host = parsed.hostname
+        port = parsed.port or 4000
+        user = unquote(parsed.username or "")
+        password = unquote(parsed.password or "")
+        database = parsed.path.lstrip("/") or "sys"
+
+        return mysql.connector.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            ssl_disabled=False
+        )
+
+    # -----------------------------------------------------
+    # OPTION 2: Separate Render Environment Variables
+    # -----------------------------------------------------
+
     return mysql.connector.connect(
         host=os.environ.get("DB_HOST"),
-        port=int(os.environ.get("DB_PORT", "14254")),
+        port=int(os.environ.get("DB_PORT", "4000")),
         user=os.environ.get("DB_USER"),
         password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME", "defaultdb"),
+        database=os.environ.get("DB_NAME", "sys"),
         ssl_disabled=False
     )
+
+
+# =========================================================
+# CREATE DATABASE TABLES
+# =========================================================
+
+def create_tables():
+
+    db = None
+    cursor = None
+
+    try:
+
+        db = get_db()
+        cursor = db.cursor()
+
+        # =================================================
+        # STUDENTS
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS students (
+                student_id INT AUTO_INCREMENT PRIMARY KEY,
+                roll_no VARCHAR(50) NOT NULL UNIQUE,
+                name VARCHAR(100) NOT NULL,
+                department VARCHAR(50) NOT NULL,
+                year VARCHAR(10) NOT NULL,
+                division VARCHAR(10) NOT NULL,
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+            )
+        """)
+
+        # =================================================
+        # FACULTY
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS faculty_registration (
+                faculty_id INT AUTO_INCREMENT PRIMARY KEY,
+                faculty_name VARCHAR(100) NOT NULL,
+                department_name VARCHAR(50) NOT NULL,
+                subject_name VARCHAR(100) NOT NULL,
+                qualification VARCHAR(100),
+                designation VARCHAR(100),
+                email VARCHAR(150),
+                mobile_number VARCHAR(30),
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+            )
+        """)
+
+        # =================================================
+        # ADMINISTRATOR
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS administrator (
+                admin_id INT AUTO_INCREMENT PRIMARY KEY,
+                admin_name VARCHAR(100) NOT NULL,
+                email VARCHAR(150),
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+            )
+        """)
+
+        # =================================================
+        # HOD
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS department_hod (
+                hod_id INT AUTO_INCREMENT PRIMARY KEY,
+                hod_name VARCHAR(100) NOT NULL,
+                department_name VARCHAR(50) NOT NULL,
+                email VARCHAR(150),
+                mobile_number VARCHAR(30),
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+            )
+        """)
+
+        # =================================================
+        # LIBRARIAN
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS librarian (
+                librarian_id INT AUTO_INCREMENT PRIMARY KEY,
+                librarian_name VARCHAR(100) NOT NULL,
+                email VARCHAR(150),
+                mobile_number VARCHAR(30),
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+            )
+        """)
+
+        # =================================================
+        # ATTENDANCE
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS student_attendance (
+                attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+                student_id INT NOT NULL,
+                faculty_id INT,
+                attendance_date DATE NOT NULL,
+                lecture_number VARCHAR(30),
+                subject_name VARCHAR(100),
+                status VARCHAR(20) NOT NULL,
+                FOREIGN KEY (student_id)
+                    REFERENCES students(student_id)
+                    ON DELETE CASCADE,
+                FOREIGN KEY (faculty_id)
+                    REFERENCES faculty_registration(faculty_id)
+                    ON DELETE SET NULL
+            )
+        """)
+
+        # =================================================
+        # LIBRARY BOOKS
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS library_books (
+                book_id INT AUTO_INCREMENT PRIMARY KEY,
+                book_name VARCHAR(150) NOT NULL,
+                author VARCHAR(150),
+                department VARCHAR(50),
+                quantity INT NOT NULL DEFAULT 0
+            )
+        """)
+
+        # =================================================
+        # LIBRARY ISSUES
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS library_issues (
+                issue_id INT AUTO_INCREMENT PRIMARY KEY,
+                book_id INT NOT NULL,
+                student_id INT NOT NULL,
+                issue_date DATE NOT NULL,
+                return_date DATE NOT NULL,
+                actual_return_date DATE,
+                status VARCHAR(30) NOT NULL DEFAULT 'Issued',
+
+                FOREIGN KEY (book_id)
+                    REFERENCES library_books(book_id)
+                    ON DELETE CASCADE,
+
+                FOREIGN KEY (student_id)
+                    REFERENCES students(student_id)
+                    ON DELETE CASCADE
+            )
+        """)
+
+        # =================================================
+        # FEES
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS fees (
+                fee_id INT AUTO_INCREMENT PRIMARY KEY,
+                student_id INT NOT NULL,
+                fee_type VARCHAR(100) NOT NULL,
+                amount DECIMAL(10,2) NOT NULL,
+                due_date DATE,
+                status VARCHAR(30) DEFAULT 'Pending',
+
+                FOREIGN KEY (student_id)
+                    REFERENCES students(student_id)
+                    ON DELETE CASCADE
+            )
+        """)
+
+        # =================================================
+        # NOTICES
+        # =================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS notices (
+                notice_id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(200) NOT NULL,
+                notice_text TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        db.commit()
+
+        print("Database tables checked/created successfully.")
+
+    except Exception as e:
+
+        if db:
+            db.rollback()
+
+        print("TABLE CREATION ERROR:", e)
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if db:
+            db.close()
+
+
 # =========================================================
 # NO CACHE
 # =========================================================
@@ -77,20 +315,39 @@ def signin():
 
         role = request.form.get("role")
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = (request.form.get("username") or "").strip()
+        password = (request.form.get("password") or "").strip()
 
         # =================================================
-        # STUDENT REGISTRATION
+        # STUDENT
         # =================================================
 
         if role == "student":
 
-            roll_no = request.form.get("roll_no")
-            name = request.form.get("name")
-            department = request.form.get("department")
-            year = request.form.get("year")
-            division = request.form.get("division")
+            roll_no = (request.form.get("roll_no") or "").strip()
+            name = (request.form.get("name") or "").strip()
+            department = (request.form.get("department") or "").strip()
+            year = (request.form.get("year") or "").strip()
+            division = (request.form.get("division") or "").strip()
+
+            # IMPORTANT FIX
+            if not roll_no or roll_no == "?":
+
+                return """
+                <h2>Student Registration Error</h2>
+                <p>Please enter a valid Roll Number.</p>
+                <br>
+                <a href="/signin">Go Back</a>
+                """
+
+            if not username or not password:
+
+                return """
+                <h2>Student Registration Error</h2>
+                <p>Username and Password are required.</p>
+                <br>
+                <a href="/signin">Go Back</a>
+                """
 
             db = None
             cursor = None
@@ -99,6 +356,44 @@ def signin():
 
                 db = get_db()
                 cursor = db.cursor()
+
+                # Check duplicate roll number
+                cursor.execute("""
+                    SELECT student_id
+                    FROM students
+                    WHERE roll_no = %s
+                """, (roll_no,))
+
+                existing_roll = cursor.fetchone()
+
+                if existing_roll:
+
+                    return f"""
+                    <h2>Student Registration Error</h2>
+                    <p>Roll Number <b>{roll_no}</b> already exists.</p>
+                    <p>Please use another Roll Number.</p>
+                    <br>
+                    <a href="/signin">Go Back</a>
+                    """
+
+                # Check duplicate username
+                cursor.execute("""
+                    SELECT student_id
+                    FROM students
+                    WHERE username = %s
+                """, (username,))
+
+                existing_username = cursor.fetchone()
+
+                if existing_username:
+
+                    return """
+                    <h2>Student Registration Error</h2>
+                    <p>Username already exists.</p>
+                    <p>Please choose another username.</p>
+                    <br>
+                    <a href="/signin">Go Back</a>
+                    """
 
                 cursor.execute("""
                     INSERT INTO students
@@ -153,7 +448,7 @@ def signin():
 
 
         # =================================================
-        # FACULTY REGISTRATION
+        # FACULTY
         # =================================================
 
         elif role == "faculty":
@@ -188,7 +483,7 @@ def signin():
                         password
                     )
                     VALUES
-                    (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """, (
                     faculty_name,
                     department_name,
@@ -231,7 +526,7 @@ def signin():
 
 
         # =================================================
-        # ADMIN REGISTRATION
+        # ADMIN
         # =================================================
 
         elif role == "admin":
@@ -255,8 +550,7 @@ def signin():
                         username,
                         password
                     )
-                    VALUES
-                    (%s, %s, %s, %s)
+                    VALUES (%s,%s,%s,%s)
                 """, (
                     admin_name,
                     email,
@@ -294,7 +588,7 @@ def signin():
 
 
         # =================================================
-        # HOD REGISTRATION
+        # HOD
         # =================================================
 
         elif role == "hod":
@@ -322,8 +616,7 @@ def signin():
                         username,
                         password
                     )
-                    VALUES
-                    (%s, %s, %s, %s, %s, %s)
+                    VALUES (%s,%s,%s,%s,%s,%s)
                 """, (
                     hod_name,
                     department_name,
@@ -363,7 +656,7 @@ def signin():
 
 
         # =================================================
-        # LIBRARIAN REGISTRATION
+        # LIBRARIAN
         # =================================================
 
         elif role == "librarian":
@@ -389,8 +682,7 @@ def signin():
                         username,
                         password
                     )
-                    VALUES
-                    (%s, %s, %s, %s, %s)
+                    VALUES (%s,%s,%s,%s,%s)
                 """, (
                     librarian_name,
                     email,
@@ -444,8 +736,8 @@ def login():
 
         role = request.form.get("role")
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = (request.form.get("username") or "").strip()
+        password = (request.form.get("password") or "").strip()
 
         db = None
         cursor = None
@@ -456,7 +748,7 @@ def login():
             cursor = db.cursor()
 
             # =================================================
-            # STUDENT LOGIN
+            # STUDENT
             # =================================================
 
             if role == "student":
@@ -471,10 +763,7 @@ def login():
                     FROM students
                     WHERE username = %s
                     AND password = %s
-                """, (
-                    username,
-                    password
-                ))
+                """, (username, password))
 
                 user = cursor.fetchone()
 
@@ -495,7 +784,7 @@ def login():
 
 
             # =================================================
-            # FACULTY LOGIN
+            # FACULTY
             # =================================================
 
             elif role == "faculty":
@@ -509,10 +798,7 @@ def login():
                     FROM faculty_registration
                     WHERE username = %s
                     AND password = %s
-                """, (
-                    username,
-                    password
-                ))
+                """, (username, password))
 
                 user = cursor.fetchone()
 
@@ -532,7 +818,7 @@ def login():
 
 
             # =================================================
-            # ADMIN LOGIN
+            # ADMIN
             # =================================================
 
             elif role == "admin":
@@ -544,10 +830,7 @@ def login():
                     FROM administrator
                     WHERE username = %s
                     AND password = %s
-                """, (
-                    username,
-                    password
-                ))
+                """, (username, password))
 
                 user = cursor.fetchone()
 
@@ -565,7 +848,7 @@ def login():
 
 
             # =================================================
-            # HOD LOGIN
+            # HOD
             # =================================================
 
             elif role == "hod":
@@ -578,10 +861,7 @@ def login():
                     FROM department_hod
                     WHERE username = %s
                     AND password = %s
-                """, (
-                    username,
-                    password
-                ))
+                """, (username, password))
 
                 user = cursor.fetchone()
 
@@ -600,7 +880,7 @@ def login():
 
 
             # =================================================
-            # LIBRARIAN LOGIN
+            # LIBRARIAN
             # =================================================
 
             elif role == "librarian":
@@ -612,10 +892,7 @@ def login():
                     FROM librarian
                     WHERE username = %s
                     AND password = %s
-                """, (
-                    username,
-                    password
-                ))
+                """, (username, password))
 
                 user = cursor.fetchone()
 
@@ -677,7 +954,6 @@ def logout():
 def dashboard():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -687,7 +963,7 @@ def dashboard():
 
 
 # =========================================================
-# STUDENT / FACULTY / HOD / ADMIN ATTENDANCE
+# STUDENT ATTENDANCE
 # =========================================================
 
 @app.route("/student_attendance")
@@ -701,7 +977,6 @@ def student_attendance():
         "admin",
         "hod"
     ]:
-
         return redirect(url_for("login"))
 
     db = None
@@ -712,13 +987,7 @@ def student_attendance():
         db = get_db()
         cursor = db.cursor()
 
-        # =====================================================
-        # STUDENT
-        # =====================================================
-
         if role == "student":
-
-            student_id = session.get("student_id")
 
             cursor.execute("""
                 SELECT
@@ -741,24 +1010,18 @@ def student_attendance():
                 ORDER BY
                     sa.attendance_date DESC,
                     sa.lecture_number DESC
-            """, (student_id,))
+            """, (session.get("student_id"),))
 
             attendance_data = cursor.fetchall()
 
             return render_template(
                 "student_attendance.html",
                 attendance_data=attendance_data,
-                user_role="student"
+                user_role=role
             )
 
 
-        # =====================================================
-        # FACULTY
-        # =====================================================
-
         if role == "faculty":
-
-            faculty_id = session.get("faculty_id")
 
             cursor.execute("""
                 SELECT
@@ -781,24 +1044,18 @@ def student_attendance():
                 ORDER BY
                     sa.attendance_date DESC,
                     sa.lecture_number DESC
-            """, (faculty_id,))
+            """, (session.get("faculty_id"),))
 
             attendance_data = cursor.fetchall()
 
             return render_template(
                 "student_attendance.html",
                 attendance_data=attendance_data,
-                user_role="faculty"
+                user_role=role
             )
 
 
-        # =====================================================
-        # HOD
-        # =====================================================
-
         if role == "hod":
-
-            department = session.get("department")
 
             cursor.execute("""
                 SELECT
@@ -821,20 +1078,16 @@ def student_attendance():
                 ORDER BY
                     sa.attendance_date DESC,
                     sa.lecture_number DESC
-            """, (department,))
+            """, (session.get("department"),))
 
             attendance_data = cursor.fetchall()
 
             return render_template(
                 "student_attendance.html",
                 attendance_data=attendance_data,
-                user_role="hod"
+                user_role=role
             )
 
-
-        # =====================================================
-        # ADMIN
-        # =====================================================
 
         cursor.execute("""
             SELECT
@@ -863,7 +1116,7 @@ def student_attendance():
         return render_template(
             "student_attendance.html",
             attendance_data=attendance_data,
-            user_role="admin"
+            user_role=role
         )
 
     except Exception as e:
@@ -885,17 +1138,14 @@ def student_attendance():
 
 
 # =========================================================
-# STUDENT - MY ATTENDANCE
+# MY ATTENDANCE
 # =========================================================
 
 @app.route("/my_attendance")
 def my_attendance():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
-
-    student_id = session.get("student_id")
 
     db = None
     cursor = None
@@ -919,7 +1169,7 @@ def my_attendance():
             ORDER BY
                 sa.attendance_date DESC,
                 sa.lecture_number DESC
-        """, (student_id,))
+        """, (session.get("student_id"),))
 
         attendance = cursor.fetchall()
 
@@ -945,17 +1195,14 @@ def my_attendance():
 
 
 # =========================================================
-# STUDENT - MY BOOKS
+# MY BOOKS
 # =========================================================
 
 @app.route("/my_books")
 def my_books():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
-
-    student_id = session.get("student_id")
 
     db = None
     cursor = None
@@ -978,7 +1225,7 @@ def my_books():
                 ON li.book_id = lb.book_id
             WHERE li.student_id = %s
             ORDER BY li.issue_date DESC
-        """, (student_id,))
+        """, (session.get("student_id"),))
 
         books = cursor.fetchall()
 
@@ -1004,17 +1251,14 @@ def my_books():
 
 
 # =========================================================
-# STUDENT - FEES
+# FEES
 # =========================================================
 
 @app.route("/fees")
 def fees():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
-
-    student_id = session.get("student_id")
 
     db = None
     cursor = None
@@ -1033,7 +1277,7 @@ def fees():
             FROM fees
             WHERE student_id = %s
             ORDER BY due_date
-        """, (student_id,))
+        """, (session.get("student_id"),))
 
         fee_data = cursor.fetchall()
 
@@ -1073,7 +1317,6 @@ def notices():
         "admin",
         "hod"
     ]:
-
         return redirect(url_for("login"))
 
     db = None
@@ -1126,7 +1369,6 @@ def notices():
 def faculty_dashboard():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1136,14 +1378,13 @@ def faculty_dashboard():
 
 
 # =========================================================
-# FACULTY - MARK ATTENDANCE
+# MARK ATTENDANCE
 # =========================================================
 
 @app.route("/mark_attendance", methods=["GET", "POST"])
 def mark_attendance():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     db = None
@@ -1177,13 +1418,11 @@ def mark_attendance():
 
                 student_id = str(student[0])
 
-                if student_id in present_students:
-
-                    status = "Present"
-
-                else:
-
-                    status = "Absent"
+                status = (
+                    "Present"
+                    if student_id in present_students
+                    else "Absent"
+                )
 
                 cursor.execute("""
                     INSERT INTO student_attendance
@@ -1195,8 +1434,7 @@ def mark_attendance():
                         subject_name,
                         status
                     )
-                    VALUES
-                    (%s, %s, %s, %s, %s, %s)
+                    VALUES (%s,%s,%s,%s,%s,%s)
                 """, (
                     student_id,
                     faculty_id,
@@ -1208,15 +1446,8 @@ def mark_attendance():
 
             db.commit()
 
-            cursor.close()
-            cursor = None
-
             return redirect(url_for("faculty_attendance"))
 
-
-        # =================================================
-        # FACULTIES
-        # =================================================
 
         cursor = db.cursor()
 
@@ -1229,11 +1460,6 @@ def mark_attendance():
         """)
 
         faculties = cursor.fetchall()
-
-
-        # =================================================
-        # STUDENTS
-        # =================================================
 
         cursor.execute("""
             SELECT
@@ -1277,28 +1503,26 @@ def mark_attendance():
 
 
 # =========================================================
-# FACULTY - VIEW ATTENDANCE
+# FACULTY ATTENDANCE
 # =========================================================
 
 @app.route("/faculty_attendance")
 def faculty_attendance():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return redirect(url_for("student_attendance"))
 
 
 # =========================================================
-# FACULTY - LIBRARY
+# FACULTY LIBRARY
 # =========================================================
 
 @app.route("/faculty_library")
 def faculty_library():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return redirect(url_for("library"))
@@ -1312,7 +1536,6 @@ def faculty_library():
 def admin_dashboard():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1322,14 +1545,13 @@ def admin_dashboard():
 
 
 # =========================================================
-# ADMIN - VIEW STUDENTS
+# ADMIN STUDENTS
 # =========================================================
 
 @app.route("/admin_students")
 def admin_students():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     db = None
@@ -1377,14 +1599,13 @@ def admin_students():
 
 
 # =========================================================
-# ADMIN - VIEW FACULTY
+# ADMIN FACULTY
 # =========================================================
 
 @app.route("/admin_faculty")
 def admin_faculty():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     db = None
@@ -1434,7 +1655,7 @@ def admin_faculty():
 
 
 # =========================================================
-# ADMIN + HOD + FACULTY - ADD NOTICE
+# ADD NOTICE
 # =========================================================
 
 @app.route("/add_notice", methods=["GET", "POST"])
@@ -1445,7 +1666,6 @@ def add_notice():
         "hod",
         "faculty"
     ]:
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1467,8 +1687,7 @@ def add_notice():
                     title,
                     notice_text
                 )
-                VALUES
-                (%s, %s)
+                VALUES (%s,%s)
             """, (
                 title,
                 notice_text
@@ -1502,14 +1721,13 @@ def add_notice():
 
 
 # =========================================================
-# ADMIN - ADD FEES
+# ADD FEES
 # =========================================================
 
 @app.route("/add_fees", methods=["GET", "POST"])
 def add_fees():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1536,8 +1754,7 @@ def add_fees():
                     due_date,
                     status
                 )
-                VALUES
-                (%s, %s, %s, %s, 'Pending')
+                VALUES (%s,%s,%s,%s,'Pending')
             """, (
                 student_id,
                 fee_type,
@@ -1569,10 +1786,6 @@ def add_fees():
             if db:
                 db.close()
 
-
-    # =================================================
-    # STUDENTS
-    # =================================================
 
     db = None
     cursor = None
@@ -1622,7 +1835,6 @@ def add_fees():
 def hod_dashboard():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1633,14 +1845,13 @@ def hod_dashboard():
 
 
 # =========================================================
-# HOD - VIEW STUDENTS
+# HOD STUDENTS
 # =========================================================
 
 @app.route("/hod_students")
 def hod_students():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     department = session.get("department")
@@ -1690,14 +1901,13 @@ def hod_students():
 
 
 # =========================================================
-# HOD - VIEW FACULTY
+# HOD FACULTY
 # =========================================================
 
 @app.route("/hod_faculty")
 def hod_faculty():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     department = session.get("department")
@@ -1756,7 +1966,6 @@ def hod_faculty():
 def librarian_dashboard():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1767,7 +1976,6 @@ def librarian_dashboard():
 
 # =========================================================
 # LIBRARY
-# STUDENT + FACULTY + LIBRARIAN
 # =========================================================
 
 @app.route("/library")
@@ -1780,7 +1988,6 @@ def library():
         "faculty",
         "librarian"
     ]:
-
         return redirect(url_for("login"))
 
     search = request.args.get("search")
@@ -1851,14 +2058,13 @@ def library():
 
 
 # =========================================================
-# LIBRARIAN - ADD BOOK
+# ADD BOOK
 # =========================================================
 
 @app.route("/add_book", methods=["GET", "POST"])
 def add_book():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1884,8 +2090,7 @@ def add_book():
                     department,
                     quantity
                 )
-                VALUES
-                (%s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s)
             """, (
                 book_name,
                 author,
@@ -1921,14 +2126,13 @@ def add_book():
 
 
 # =========================================================
-# LIBRARIAN - DELETE BOOK
+# DELETE BOOK
 # =========================================================
 
 @app.route("/delete_book/<int:book_id>")
 def delete_book(book_id):
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = None
@@ -1970,14 +2174,13 @@ def delete_book(book_id):
 
 
 # =========================================================
-# LIBRARIAN - ISSUE BOOK
+# ISSUE BOOK
 # =========================================================
 
 @app.route("/issue_book", methods=["GET", "POST"])
 def issue_book():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = None
@@ -1994,10 +2197,6 @@ def issue_book():
             student_id = request.form.get("student_id")
             issue_date = request.form.get("issue_date")
 
-            # =================================================
-            # CHECK BOOK
-            # =================================================
-
             cursor.execute("""
                 SELECT quantity
                 FROM library_books
@@ -2007,17 +2206,10 @@ def issue_book():
             book = cursor.fetchone()
 
             if not book:
-
                 return "Book not found."
 
             if book[0] <= 0:
-
                 return "Book is not available."
-
-
-            # =================================================
-            # CHECK DUPLICATE ISSUE
-            # =================================================
 
             cursor.execute("""
                 SELECT issue_id
@@ -2033,13 +2225,7 @@ def issue_book():
             existing = cursor.fetchone()
 
             if existing:
-
                 return "This student already has this book."
-
-
-            # =================================================
-            # RETURN DATE = ISSUE DATE + 10 DAYS
-            # =================================================
 
             try:
 
@@ -2054,11 +2240,6 @@ def issue_book():
 
             return_date = issue_date_obj + timedelta(days=10)
 
-
-            # =================================================
-            # INSERT ISSUE
-            # =================================================
-
             cursor.execute("""
                 INSERT INTO library_issues
                 (
@@ -2068,19 +2249,13 @@ def issue_book():
                     return_date,
                     status
                 )
-                VALUES
-                (%s, %s, %s, %s, 'Issued')
+                VALUES (%s,%s,%s,%s,'Issued')
             """, (
                 book_id,
                 student_id,
                 issue_date_obj,
                 return_date
             ))
-
-
-            # =================================================
-            # REDUCE QUANTITY
-            # =================================================
 
             cursor.execute("""
                 UPDATE library_books
@@ -2091,11 +2266,6 @@ def issue_book():
             db.commit()
 
             return redirect(url_for("issued_books"))
-
-
-        # =================================================
-        # AVAILABLE BOOKS
-        # =================================================
 
         cursor.execute("""
             SELECT
@@ -2108,11 +2278,6 @@ def issue_book():
         """)
 
         books = cursor.fetchall()
-
-
-        # =================================================
-        # STUDENTS
-        # =================================================
 
         cursor.execute("""
             SELECT
@@ -2153,14 +2318,13 @@ def issue_book():
 
 
 # =========================================================
-# LIBRARIAN - ISSUED BOOKS
+# ISSUED BOOKS
 # =========================================================
 
 @app.route("/issued_books")
 def issued_books():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = None
@@ -2213,14 +2377,13 @@ def issued_books():
 
 
 # =========================================================
-# LIBRARIAN - RETURN BOOK
+# RETURN BOOK
 # =========================================================
 
 @app.route("/return_book/<int:issue_id>")
 def return_book(issue_id):
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = None
@@ -2230,10 +2393,6 @@ def return_book(issue_id):
 
         db = get_db()
         cursor = db.cursor()
-
-        # =================================================
-        # FIND BOOK
-        # =================================================
 
         cursor.execute("""
             SELECT book_id
@@ -2245,15 +2404,9 @@ def return_book(issue_id):
         issue = cursor.fetchone()
 
         if not issue:
-
             return "Book already returned or issue not found."
 
         book_id = issue[0]
-
-
-        # =================================================
-        # UPDATE ISSUE
-        # =================================================
 
         cursor.execute("""
             UPDATE library_issues
@@ -2262,11 +2415,6 @@ def return_book(issue_id):
                 status = 'Returned'
             WHERE issue_id = %s
         """, (issue_id,))
-
-
-        # =================================================
-        # INCREASE QUANTITY
-        # =================================================
 
         cursor.execute("""
             UPDATE library_books
@@ -2338,7 +2486,17 @@ def health():
 
 
 # =========================================================
-# RUN APPLICATION
+# STARTUP
+# =========================================================
+
+try:
+    create_tables()
+except Exception as e:
+    print("Startup database error:", e)
+
+
+# =========================================================
+# RUN
 # =========================================================
 
 if __name__ == "__main__":
