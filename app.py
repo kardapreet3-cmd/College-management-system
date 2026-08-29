@@ -2,7 +2,7 @@
 import os
 from datetime import datetime, timedelta
 
-import psycopg2
+import mysql.connector
 
 from flask import (
     Flask,
@@ -27,31 +27,18 @@ app.secret_key = os.environ.get(
 
 
 # =========================================================
-# DATABASE CONNECTION - AIVEN POSTGRESQL
+# DATABASE CONNECTION - AIVEN MYSQL
 # =========================================================
 
 def get_db():
-    # Render/Aiven: prefer a complete PostgreSQL DATABASE_URL.
-    # Fall back to separate DB_* environment variables if DATABASE_URL is not set.
-    database_url = os.environ.get("DATABASE_URL")
-
-    if database_url:
-        return psycopg2.connect(
-            database_url,
-            sslmode="require",
-            connect_timeout=15
-        )
-
-    return psycopg2.connect(
-        host=os.environ.get("DB_HOST"),
-        port=int(os.environ.get("DB_PORT", "14254")),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        dbname=os.environ.get("DB_NAME", "defaultdb"),
-        sslmode="require",
-        connect_timeout=15
+    return mysql.connector.connect(
+        host=os.environ.get("host"),
+        port=int(os.environ.get("port", "14254")),
+        user=os.environ.get("user"),
+        password=os.environ.get("password"),
+        database=os.environ.get("database", "defaultdb"),
+        ssl_disabled=False
     )
-
 
 # =========================================================
 # NO CACHE
@@ -1817,9 +1804,9 @@ def library():
                     department,
                     quantity
                 FROM library_books
-                WHERE book_name ILIKE %s
-                   OR author ILIKE %s
-                   OR department ILIKE %s
+                WHERE book_name LIKE %s
+                   OR author LIKE %s
+                   OR department LIKE %s
                 ORDER BY book_name
             """, (
                 "%" + search + "%",
