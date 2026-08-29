@@ -21,8 +21,9 @@ app.secret_key = os.environ.get(
     "college-management-secret-key"
 )
 
+
 # =========================================================
-# DATABASE CONNECTION - AIVEN
+# DATABASE CONNECTION - AIVEN MYSQL
 # =========================================================
 
 def get_db():
@@ -34,6 +35,10 @@ def get_db():
         database=os.environ.get("DB_NAME", "defaultdb"),
         ssl_disabled=False
     )
+
+
+# =========================================================
+# NO CACHE
 # =========================================================
 
 @app.after_request
@@ -55,7 +60,6 @@ def add_no_cache(response):
 
 @app.route("/")
 def home():
-
     return render_template("home.html")
 
 
@@ -73,9 +77,9 @@ def signin():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # =================================================
+        # =====================================================
         # STUDENT REGISTRATION
-        # =================================================
+        # =====================================================
 
         if role == "student":
 
@@ -144,9 +148,9 @@ def signin():
                 if db:
                     db.close()
 
-        # =================================================
+        # =====================================================
         # FACULTY REGISTRATION
-        # =================================================
+        # =====================================================
 
         elif role == "faculty":
 
@@ -221,9 +225,9 @@ def signin():
                 if db:
                     db.close()
 
-        # =================================================
+        # =====================================================
         # ADMIN REGISTRATION
-        # =================================================
+        # =====================================================
 
         elif role == "admin":
 
@@ -283,9 +287,9 @@ def signin():
                 if db:
                     db.close()
 
-        # =================================================
+        # =====================================================
         # HOD REGISTRATION
-        # =================================================
+        # =====================================================
 
         elif role == "hod":
 
@@ -351,9 +355,9 @@ def signin():
                 if db:
                     db.close()
 
-        # =================================================
+        # =====================================================
         # LIBRARIAN REGISTRATION
-        # =================================================
+        # =====================================================
 
         elif role == "librarian":
 
@@ -622,6 +626,8 @@ def login():
             return f"""
             <h2>Database Error</h2>
             <p>{e}</p>
+            <br>
+            <a href="/login">Go Back</a>
             """
 
         finally:
@@ -655,12 +661,14 @@ def logout():
 def dashboard():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
 
     return render_template(
         "dashboard.html",
-        student_name=session.get("student_name")
+        student_name=session.get("student_name"),
+        department=session.get("department"),
+        year=session.get("year"),
+        division=session.get("division")
     )
 
 
@@ -679,19 +687,136 @@ def student_attendance():
         "admin",
         "hod"
     ]:
-
         return redirect(url_for("login"))
 
-    db = get_db()
-    cursor = db.cursor()
+    db = None
+    cursor = None
 
-    # =====================================================
-    # STUDENT
-    # =====================================================
+    try:
 
-    if role == "student":
+        db = get_db()
+        cursor = db.cursor()
 
-        student_id = session.get("student_id")
+        # =====================================================
+        # STUDENT
+        # =====================================================
+
+        if role == "student":
+
+            student_id = session.get("student_id")
+
+            cursor.execute("""
+                SELECT
+                    sa.attendance_date,
+                    sa.lecture_number,
+                    sa.subject_name,
+                    s.roll_no,
+                    s.name,
+                    s.department,
+                    s.year,
+                    s.division,
+                    f.faculty_name,
+                    sa.status
+                FROM student_attendance sa
+                INNER JOIN students s
+                    ON sa.student_id = s.student_id
+                LEFT JOIN faculty_registration f
+                    ON sa.faculty_id = f.faculty_id
+                WHERE sa.student_id = %s
+                ORDER BY
+                    sa.attendance_date DESC,
+                    sa.lecture_number DESC
+            """, (student_id,))
+
+            attendance_data = cursor.fetchall()
+
+            return render_template(
+                "student_attendance.html",
+                attendance_data=attendance_data,
+                user_role="student"
+            )
+
+        # =====================================================
+        # FACULTY
+        # =====================================================
+
+        if role == "faculty":
+
+            faculty_id = session.get("faculty_id")
+
+            cursor.execute("""
+                SELECT
+                    sa.attendance_date,
+                    sa.lecture_number,
+                    sa.subject_name,
+                    s.roll_no,
+                    s.name,
+                    s.department,
+                    s.year,
+                    s.division,
+                    f.faculty_name,
+                    sa.status
+                FROM student_attendance sa
+                INNER JOIN students s
+                    ON sa.student_id = s.student_id
+                LEFT JOIN faculty_registration f
+                    ON sa.faculty_id = f.faculty_id
+                WHERE sa.faculty_id = %s
+                ORDER BY
+                    sa.attendance_date DESC,
+                    sa.lecture_number DESC
+            """, (faculty_id,))
+
+            attendance_data = cursor.fetchall()
+
+            return render_template(
+                "student_attendance.html",
+                attendance_data=attendance_data,
+                user_role="faculty"
+            )
+
+        # =====================================================
+        # HOD
+        # =====================================================
+
+        if role == "hod":
+
+            department = session.get("department")
+
+            cursor.execute("""
+                SELECT
+                    sa.attendance_date,
+                    sa.lecture_number,
+                    sa.subject_name,
+                    s.roll_no,
+                    s.name,
+                    s.department,
+                    s.year,
+                    s.division,
+                    f.faculty_name,
+                    sa.status
+                FROM student_attendance sa
+                INNER JOIN students s
+                    ON sa.student_id = s.student_id
+                LEFT JOIN faculty_registration f
+                    ON sa.faculty_id = f.faculty_id
+                WHERE s.department = %s
+                ORDER BY
+                    sa.attendance_date DESC,
+                    sa.lecture_number DESC
+            """, (department,))
+
+            attendance_data = cursor.fetchall()
+
+            return render_template(
+                "student_attendance.html",
+                attendance_data=attendance_data,
+                user_role="hod"
+            )
+
+        # =====================================================
+        # ADMIN
+        # =====================================================
 
         cursor.execute("""
             SELECT
@@ -710,143 +835,35 @@ def student_attendance():
                 ON sa.student_id = s.student_id
             LEFT JOIN faculty_registration f
                 ON sa.faculty_id = f.faculty_id
-            WHERE sa.student_id = %s
             ORDER BY
                 sa.attendance_date DESC,
                 sa.lecture_number DESC
-        """, (student_id,))
+        """)
 
         attendance_data = cursor.fetchall()
-
-        cursor.close()
-        db.close()
 
         return render_template(
             "student_attendance.html",
             attendance_data=attendance_data,
-            user_role="student"
+            user_role="admin"
         )
 
-    # =====================================================
-    # FACULTY
-    # =====================================================
+    except mysql.connector.Error as e:
 
-    if role == "faculty":
+        return f"""
+        <h2>Attendance Database Error</h2>
+        <p>{e}</p>
+        <br>
+        <a href="/dashboard">Go Back</a>
+        """
 
-        faculty_id = session.get("faculty_id")
+    finally:
 
-        cursor.execute("""
-            SELECT
-                sa.attendance_date,
-                sa.lecture_number,
-                sa.subject_name,
-                s.roll_no,
-                s.name,
-                s.department,
-                s.year,
-                s.division,
-                f.faculty_name,
-                sa.status
-            FROM student_attendance sa
-            INNER JOIN students s
-                ON sa.student_id = s.student_id
-            LEFT JOIN faculty_registration f
-                ON sa.faculty_id = f.faculty_id
-            WHERE sa.faculty_id = %s
-            ORDER BY
-                sa.attendance_date DESC,
-                sa.lecture_number DESC
-        """, (faculty_id,))
+        if cursor:
+            cursor.close()
 
-        attendance_data = cursor.fetchall()
-
-        cursor.close()
-        db.close()
-
-        return render_template(
-            "student_attendance.html",
-            attendance_data=attendance_data,
-            user_role="faculty"
-        )
-
-    # =====================================================
-    # HOD
-    # =====================================================
-
-    if role == "hod":
-
-        department = session.get("department")
-
-        cursor.execute("""
-            SELECT
-                sa.attendance_date,
-                sa.lecture_number,
-                sa.subject_name,
-                s.roll_no,
-                s.name,
-                s.department,
-                s.year,
-                s.division,
-                f.faculty_name,
-                sa.status
-            FROM student_attendance sa
-            INNER JOIN students s
-                ON sa.student_id = s.student_id
-            LEFT JOIN faculty_registration f
-                ON sa.faculty_id = f.faculty_id
-            WHERE s.department = %s
-            ORDER BY
-                sa.attendance_date DESC,
-                sa.lecture_number DESC
-        """, (department,))
-
-        attendance_data = cursor.fetchall()
-
-        cursor.close()
-        db.close()
-
-        return render_template(
-            "student_attendance.html",
-            attendance_data=attendance_data,
-            user_role="hod"
-        )
-
-    # =====================================================
-    # ADMIN
-    # =====================================================
-
-    cursor.execute("""
-        SELECT
-            sa.attendance_date,
-            sa.lecture_number,
-            sa.subject_name,
-            s.roll_no,
-            s.name,
-            s.department,
-            s.year,
-            s.division,
-            f.faculty_name,
-            sa.status
-        FROM student_attendance sa
-        INNER JOIN students s
-            ON sa.student_id = s.student_id
-        LEFT JOIN faculty_registration f
-            ON sa.faculty_id = f.faculty_id
-        ORDER BY
-            sa.attendance_date DESC,
-            sa.lecture_number DESC
-    """)
-
-    attendance_data = cursor.fetchall()
-
-    cursor.close()
-    db.close()
-
-    return render_template(
-        "student_attendance.html",
-        attendance_data=attendance_data,
-        user_role="admin"
-    )
+        if db:
+            db.close()
 
 
 # =========================================================
@@ -857,7 +874,6 @@ def student_attendance():
 def my_attendance():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
 
     student_id = session.get("student_id")
@@ -900,7 +916,6 @@ def my_attendance():
 def my_books():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
 
     student_id = session.get("student_id")
@@ -942,7 +957,6 @@ def my_books():
 def fees():
 
     if session.get("role") != "student":
-
         return redirect(url_for("login"))
 
     student_id = session.get("student_id")
@@ -987,7 +1001,6 @@ def notices():
         "admin",
         "hod"
     ]:
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1023,12 +1036,13 @@ def notices():
 def faculty_dashboard():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return render_template(
         "faculty_dashboard.html",
-        faculty_name=session.get("faculty_name")
+        faculty_name=session.get("faculty_name"),
+        department=session.get("department"),
+        subject=session.get("subject")
     )
 
 
@@ -1040,43 +1054,38 @@ def faculty_dashboard():
 def mark_attendance():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     db = get_db()
+    cursor = db.cursor(dictionary=True)
 
-    if request.method == "POST":
+    try:
 
-        attendance_date = request.form.get("attendance_date")
-        lecture_number = request.form.get("lecture_number")
-        subject_name = request.form.get("subject_name")
+        if request.method == "POST":
 
-        faculty_id = session.get("faculty_id")
+            attendance_date = request.form.get("attendance_date")
+            lecture_number = request.form.get("lecture_number")
+            subject_name = request.form.get("subject_name")
 
-        present_students = request.form.getlist("status")
+            faculty_id = session.get("faculty_id")
 
-        cursor = db.cursor(dictionary=True)
+            present_students = request.form.getlist("status")
 
-        cursor.execute("""
-            SELECT student_id
-            FROM students
-            ORDER BY roll_no
-        """)
+            cursor.execute("""
+                SELECT student_id
+                FROM students
+                ORDER BY roll_no
+            """)
 
-        all_students = cursor.fetchall()
-
-        try:
+            all_students = cursor.fetchall()
 
             for student in all_students:
 
                 student_id = str(student["student_id"])
 
                 if student_id in present_students:
-
                     status = "Present"
-
                 else:
-
                     status = "Absent"
 
                 cursor.execute("""
@@ -1102,58 +1111,61 @@ def mark_attendance():
 
             db.commit()
 
-            cursor.close()
-            db.close()
-
             return redirect(url_for("faculty_attendance"))
 
-        except mysql.connector.Error as e:
+        # =====================================================
+        # FACULTIES
+        # =====================================================
 
-            db.rollback()
+        cursor.execute("""
+            SELECT
+                faculty_id,
+                faculty_name
+            FROM faculty_registration
+            ORDER BY faculty_name
+        """)
 
-            cursor.close()
-            db.close()
+        faculties = cursor.fetchall()
 
-            return f"""
-            <h2>Attendance Save Error</h2>
-            <p>{e}</p>
-            <a href="/mark_attendance">Go Back</a>
-            """
+        # =====================================================
+        # STUDENTS
+        # =====================================================
 
-    cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT
+                student_id,
+                roll_no,
+                name,
+                department,
+                year,
+                division
+            FROM students
+            ORDER BY roll_no
+        """)
 
-    cursor.execute("""
-        SELECT
-            faculty_id,
-            faculty_name
-        FROM faculty_registration
-        ORDER BY faculty_name
-    """)
+        students = cursor.fetchall()
 
-    faculties = cursor.fetchall()
+        return render_template(
+            "mark_attendance.html",
+            faculties=faculties,
+            students=students
+        )
 
-    cursor.execute("""
-        SELECT
-            student_id,
-            roll_no,
-            name,
-            department,
-            year,
-            division
-        FROM students
-        ORDER BY roll_no
-    """)
+    except mysql.connector.Error as e:
 
-    students = cursor.fetchall()
+        db.rollback()
 
-    cursor.close()
-    db.close()
+        return f"""
+        <h2>Attendance Save Error</h2>
+        <p>{e}</p>
+        <br>
+        <a href="/mark_attendance">Go Back</a>
+        """
 
-    return render_template(
-        "mark_attendance.html",
-        faculties=faculties,
-        students=students
-    )
+    finally:
+
+        cursor.close()
+        db.close()
 
 
 # =========================================================
@@ -1164,7 +1176,6 @@ def mark_attendance():
 def faculty_attendance():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return redirect(url_for("student_attendance"))
@@ -1178,7 +1189,6 @@ def faculty_attendance():
 def faculty_library():
 
     if session.get("role") != "faculty":
-
         return redirect(url_for("login"))
 
     return redirect(url_for("library"))
@@ -1192,7 +1202,6 @@ def faculty_library():
 def admin_dashboard():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1209,7 +1218,6 @@ def admin_dashboard():
 def admin_students():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1247,7 +1255,6 @@ def admin_students():
 def admin_faculty():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1291,7 +1298,6 @@ def add_notice():
         "hod",
         "faculty"
     ]:
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1319,17 +1325,11 @@ def add_notice():
 
             db.commit()
 
-            cursor.close()
-            db.close()
-
             return redirect(url_for("notices"))
 
         except mysql.connector.Error as e:
 
             db.rollback()
-
-            cursor.close()
-            db.close()
 
             return f"""
             <h2>Notice Error</h2>
@@ -1337,6 +1337,11 @@ def add_notice():
             <br>
             <a href="/add_notice">Go Back</a>
             """
+
+        finally:
+
+            cursor.close()
+            db.close()
 
     return render_template("add_notice.html")
 
@@ -1349,7 +1354,6 @@ def add_notice():
 def add_fees():
 
     if session.get("role") != "admin":
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1384,17 +1388,11 @@ def add_fees():
 
             db.commit()
 
-            cursor.close()
-            db.close()
-
             return redirect(url_for("admin_dashboard"))
 
         except mysql.connector.Error as e:
 
             db.rollback()
-
-            cursor.close()
-            db.close()
 
             return f"""
             <h2>Fee Error</h2>
@@ -1402,6 +1400,11 @@ def add_fees():
             <br>
             <a href="/add_fees">Go Back</a>
             """
+
+        finally:
+
+            cursor.close()
+            db.close()
 
     db = get_db()
     cursor = db.cursor()
@@ -1434,7 +1437,6 @@ def add_fees():
 def hod_dashboard():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1452,7 +1454,6 @@ def hod_dashboard():
 def hod_students():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     department = session.get("department")
@@ -1492,7 +1493,6 @@ def hod_students():
 def hod_faculty():
 
     if session.get("role") != "hod":
-
         return redirect(url_for("login"))
 
     department = session.get("department")
@@ -1534,7 +1534,6 @@ def hod_faculty():
 def librarian_dashboard():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     return render_template(
@@ -1558,7 +1557,6 @@ def library():
         "faculty",
         "librarian"
     ]:
-
         return redirect(url_for("login"))
 
     search = request.args.get("search")
@@ -1619,7 +1617,6 @@ def library():
 def add_book():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -1653,17 +1650,11 @@ def add_book():
 
             db.commit()
 
-            cursor.close()
-            db.close()
-
             return redirect(url_for("library"))
 
         except mysql.connector.Error as e:
 
             db.rollback()
-
-            cursor.close()
-            db.close()
 
             return f"""
             <h2>Add Book Error</h2>
@@ -1671,6 +1662,11 @@ def add_book():
             <br>
             <a href="/add_book">Go Back</a>
             """
+
+        finally:
+
+            cursor.close()
+            db.close()
 
     return render_template("add_book.html")
 
@@ -1683,7 +1679,6 @@ def add_book():
 def delete_book(book_id):
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1698,17 +1693,11 @@ def delete_book(book_id):
 
         db.commit()
 
-        cursor.close()
-        db.close()
-
         return redirect(url_for("library"))
 
     except mysql.connector.Error as e:
 
         db.rollback()
-
-        cursor.close()
-        db.close()
 
         return f"""
         <h2>Delete Book Error</h2>
@@ -1716,6 +1705,11 @@ def delete_book(book_id):
         <br>
         <a href="/library">Go Back</a>
         """
+
+    finally:
+
+        cursor.close()
+        db.close()
 
 
 # =========================================================
@@ -1726,19 +1720,18 @@ def delete_book(book_id):
 def issue_book():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = get_db()
     cursor = db.cursor()
 
-    if request.method == "POST":
+    try:
 
-        book_id = request.form.get("book_id")
-        student_id = request.form.get("student_id")
-        issue_date = request.form.get("issue_date")
+        if request.method == "POST":
 
-        try:
+            book_id = request.form.get("book_id")
+            student_id = request.form.get("student_id")
+            issue_date = request.form.get("issue_date")
 
             # =================================================
             # CHECK BOOK
@@ -1753,17 +1746,9 @@ def issue_book():
             book = cursor.fetchone()
 
             if not book:
-
-                cursor.close()
-                db.close()
-
                 return "Book not found."
 
             if book[0] <= 0:
-
-                cursor.close()
-                db.close()
-
                 return "Book is not available."
 
             # =================================================
@@ -1784,10 +1769,6 @@ def issue_book():
             existing = cursor.fetchone()
 
             if existing:
-
-                cursor.close()
-                db.close()
-
                 return "This student already has this book."
 
             # =================================================
@@ -1834,64 +1815,60 @@ def issue_book():
 
             db.commit()
 
-            cursor.close()
-            db.close()
-
             return redirect(url_for("issued_books"))
 
-        except mysql.connector.Error as e:
+        # =================================================
+        # AVAILABLE BOOKS
+        # =================================================
 
-            db.rollback()
+        cursor.execute("""
+            SELECT
+                book_id,
+                book_name,
+                author
+            FROM library_books
+            WHERE quantity > 0
+            ORDER BY book_name
+        """)
 
-            cursor.close()
-            db.close()
+        books = cursor.fetchall()
 
-            return f"""
-            <h2>Issue Book Error</h2>
-            <p>{e}</p>
-            <br>
-            <a href="/issue_book">Go Back</a>
-            """
+        # =================================================
+        # STUDENTS
+        # =================================================
 
-    # =================================================
-    # AVAILABLE BOOKS
-    # =================================================
+        cursor.execute("""
+            SELECT
+                student_id,
+                roll_no,
+                name
+            FROM students
+            ORDER BY roll_no
+        """)
 
-    cursor.execute("""
-        SELECT
-            book_id,
-            book_name,
-            author
-        FROM library_books
-        WHERE quantity > 0
-        ORDER BY book_name
-    """)
+        students = cursor.fetchall()
 
-    books = cursor.fetchall()
+        return render_template(
+            "issue_book.html",
+            books=books,
+            students=students
+        )
 
-    # =================================================
-    # STUDENTS
-    # =================================================
+    except mysql.connector.Error as e:
 
-    cursor.execute("""
-        SELECT
-            student_id,
-            roll_no,
-            name
-        FROM students
-        ORDER BY roll_no
-    """)
+        db.rollback()
 
-    students = cursor.fetchall()
+        return f"""
+        <h2>Issue Book Error</h2>
+        <p>{e}</p>
+        <br>
+        <a href="/issue_book">Go Back</a>
+        """
 
-    cursor.close()
-    db.close()
+    finally:
 
-    return render_template(
-        "issue_book.html",
-        books=books,
-        students=students
-    )
+        cursor.close()
+        db.close()
 
 
 # =========================================================
@@ -1902,7 +1879,6 @@ def issue_book():
 def issued_books():
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1945,7 +1921,6 @@ def issued_books():
 def return_book(issue_id):
 
     if session.get("role") != "librarian":
-
         return redirect(url_for("login"))
 
     db = get_db()
@@ -1967,10 +1942,6 @@ def return_book(issue_id):
         issue = cursor.fetchone()
 
         if not issue:
-
-            cursor.close()
-            db.close()
-
             return "Book already returned or issue not found."
 
         book_id = issue[0]
@@ -1999,17 +1970,11 @@ def return_book(issue_id):
 
         db.commit()
 
-        cursor.close()
-        db.close()
-
         return redirect(url_for("issued_books"))
 
     except mysql.connector.Error as e:
 
         db.rollback()
-
-        cursor.close()
-        db.close()
 
         return f"""
         <h2>Return Book Error</h2>
@@ -2018,12 +1983,18 @@ def return_book(issue_id):
         <a href="/issued_books">Go Back</a>
         """
 
+    finally:
+
+        cursor.close()
+        db.close()
+
 
 # =========================================================
 # RUN APPLICATION
 # =========================================================
 
 if __name__ == "__main__":
+
     port = int(os.environ.get("PORT", 10000))
 
     app.run(
