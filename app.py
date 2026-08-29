@@ -9,15 +9,7 @@ from flask import (
     url_for,
     session
 )
-def get_db():
-    return mysql.connector.connect(
-        host=os.environ.get("DB_HOST"),
-        port=int(os.environ.get("DB_PORT", 3306)),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME"),
-        ssl_disabled=False
-    )
+
 # =========================================================
 # FLASK APP
 # =========================================================
@@ -25,45 +17,23 @@ def get_db():
 app = Flask(__name__)
 
 app.secret_key = os.environ.get(
-    "FLASK_SECRET_KEY",
-    "college_management_2026"
+    "SECRET_KEY",
+    "college-management-secret-key"
 )
-
 
 # =========================================================
 # DATABASE CONNECTION - AIVEN
 # =========================================================
-#
-# Before running:
-#
-# macOS Terminal:
-# export AIVEN_DB_PASSWORD='YOUR_AIVEN_PASSWORD'
-#
-# Then:
-# python app.py
-#
-# =========================================================
-app = Flask(__name__)
 
-app.secret_key = os.environ.get("SECRET_KEY", "college-management-secret-key")
-
-
-# ================= DATABASE CONNECTION =================
-
-import os
-import mysql.connector
-
-db = mysql.connector.connect(
-    host=os.getenv("DB_HOST"),
-    port=int(os.getenv("DB_PORT", "14254")),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME", "defaultdb"),
-    ssl_disabled=False
-)
-
-# =========================================================
-# PREVENT BROWSER CACHE
+def get_db():
+    return mysql.connector.connect(
+        host=os.environ.get("DB_HOST"),
+        port=int(os.environ.get("DB_PORT", "14254")),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD"),
+        database=os.environ.get("DB_NAME", "defaultdb"),
+        ssl_disabled=False
+    )
 # =========================================================
 
 @app.after_request
