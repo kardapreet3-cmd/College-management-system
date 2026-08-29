@@ -1,3 +1,4 @@
+
 import os
 from datetime import datetime, timedelta
 
@@ -30,6 +31,17 @@ app.secret_key = os.environ.get(
 # =========================================================
 
 def get_db():
+    # Render/Aiven: prefer a complete PostgreSQL DATABASE_URL.
+    # Fall back to separate DB_* environment variables if DATABASE_URL is not set.
+    database_url = os.environ.get("DATABASE_URL")
+
+    if database_url:
+        return psycopg2.connect(
+            database_url,
+            sslmode="require",
+            connect_timeout=15
+        )
+
     return psycopg2.connect(
         host=os.environ.get("DB_HOST"),
         port=int(os.environ.get("DB_PORT", "14254")),
