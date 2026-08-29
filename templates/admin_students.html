@@ -2,17 +2,27 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
-    <title>All Students</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registered Students</title>
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f7fb;
         }
+
+        /* ================= HEADER ================= */
 
         .header {
             background: #1677ff;
@@ -22,63 +32,184 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .header h1 {
             margin: 0;
+            font-size: 25px;
         }
 
-        .back {
-            color: white;
+        .back-btn {
+            background: white;
+            color: #1677ff;
+
             text-decoration: none;
-            background: #28a745;
+
             padding: 10px 18px;
+
             border-radius: 6px;
+
+            font-weight: bold;
         }
+
+        .back-btn:hover {
+            background: #e8f0ff;
+        }
+
+        /* ================= CONTAINER ================= */
 
         .container {
             width: 95%;
-            max-width: 1200px;
+            max-width: 1300px;
+
             margin: 30px auto;
         }
 
-        .box {
+        /* ================= CARD ================= */
+
+        .card {
             background: white;
+
             padding: 25px;
-            border-radius: 10px;
 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
 
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-container {
+            width: 100%;
             overflow-x: auto;
         }
 
         table {
             width: 100%;
+
             border-collapse: collapse;
-            margin-top: 20px;
+
+            min-width: 850px;
         }
 
         th {
             background: #1677ff;
             color: white;
-            padding: 12px;
-            text-align: center;
+
+            padding: 14px 12px;
+
+            text-align: left;
+
+            font-size: 14px;
         }
 
         td {
-            padding: 12px;
+            padding: 13px 12px;
+
             border-bottom: 1px solid #ddd;
-            text-align: center;
+
+            font-size: 14px;
         }
 
-        tr:hover {
-            background: #f1f5ff;
+        tbody tr:hover {
+            background: #f5f8ff;
         }
+
+        /* ================= BADGES ================= */
+
+        .department {
+            background: #e8f0ff;
+            color: #1677ff;
+
+            padding: 5px 10px;
+
+            border-radius: 15px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+        .year {
+            background: #f1f5f9;
+            color: #334155;
+
+            padding: 5px 10px;
+
+            border-radius: 15px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+        .division {
+            background: #ecfdf5;
+            color: #15803d;
+
+            padding: 5px 10px;
+
+            border-radius: 15px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+        .roll {
+            font-weight: bold;
+        }
+
+        .username {
+            color: #555;
+        }
+
+        /* ================= EMPTY ================= */
 
         .empty {
             text-align: center;
-            padding: 30px;
-            color: #777;
+
+            padding: 40px;
+
+            color: #666;
+        }
+
+        .empty h3 {
+            color: #333;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                width: 98%;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
         }
 
     </style>
@@ -89,117 +220,195 @@
 <body>
 
 
+<!-- ================================================= -->
 <!-- HEADER -->
+<!-- ================================================= -->
 
 <div class="header">
 
-    <h1>Administrator - Students</h1>
+    <h1>Registered Students</h1>
 
     <a href="{{ url_for('admin_dashboard') }}"
-       class="back">
+       class="back-btn">
 
-        Back to Dashboard
+        ← Dashboard
 
     </a>
 
 </div>
 
 
-<!-- CONTENT -->
+<!-- ================================================= -->
+<!-- MAIN CONTAINER -->
+<!-- ================================================= -->
 
 <div class="container">
 
-    <div class="box">
 
-        <h2>All Registered Students</h2>
+    <div class="card">
+
+        <h2>👨‍🎓 Registered Students</h2>
+
+        <p>
+            View all students registered in the College Management System.
+        </p>
 
 
         {% if students %}
 
-        <table>
 
-            <thead>
+        <!-- ================================================= -->
+        <!-- TABLE -->
+        <!-- ================================================= -->
 
-                <tr>
+        <div class="table-container">
 
-                    <th>Student ID</th>
+            <table>
 
-                    <th>Roll No</th>
+                <thead>
 
-                    <th>Name</th>
+                    <tr>
 
-                    <th>Department</th>
+                        <th>
+                            Roll No
+                        </th>
 
-                    <th>Year</th>
+                        <th>
+                            Student Name
+                        </th>
 
-                    <th>Division</th>
+                        <th>
+                            Department
+                        </th>
 
-                    <th>Username</th>
+                        <th>
+                            Year
+                        </th>
 
-                </tr>
+                        <th>
+                            Division
+                        </th>
 
-            </thead>
+                        <th>
+                            Username
+                        </th>
+
+                    </tr>
+
+                </thead>
 
 
-            <tbody>
+                <tbody>
 
-                {% for student in students %}
 
-                <tr>
+                    {% for student in students %}
 
-                    <td>
-                        {{ student[0] }}
-                    </td>
 
-                    <td>
-                        {{ student[1] }}
-                    </td>
+                    <tr>
 
-                    <td>
-                        {{ student[2] }}
-                    </td>
 
-                    <td>
-                        {{ student[3] }}
-                    </td>
+                        <!-- ================= ROLL NO ================= -->
 
-                    <td>
-                        {{ student[4] }}
-                    </td>
+                        <td class="roll">
 
-                    <td>
-                        {{ student[5] }}
-                    </td>
+                            {{ student[1] }}
 
-                    <td>
-                        {{ student[6] }}
-                    </td>
+                        </td>
 
-                </tr>
 
-                {% endfor %}
+                        <!-- ================= NAME ================= -->
 
-            </tbody>
+                        <td>
 
-        </table>
+                            {{ student[2] }}
+
+                        </td>
+
+
+                        <!-- ================= DEPARTMENT ================= -->
+
+                        <td>
+
+                            <span class="department">
+
+                                {{ student[3] }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ================= YEAR ================= -->
+
+                        <td>
+
+                            <span class="year">
+
+                                {{ student[4] }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ================= DIVISION ================= -->
+
+                        <td>
+
+                            <span class="division">
+
+                                {{ student[5] }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ================= USERNAME ================= -->
+
+                        <td class="username">
+
+                            {{ student[6] }}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
 
 
         {% else %}
 
+
+        <!-- ================================================= -->
+        <!-- NO STUDENTS -->
+        <!-- ================================================= -->
+
         <div class="empty">
 
-            <h3>No Students Found</h3>
+            <h3>No Registered Students</h3>
 
             <p>
-                There are currently no registered students.
+                No students are currently registered in the system.
             </p>
 
         </div>
+
 
         {% endif %}
 
 
     </div>
+
 
 </div>
 
